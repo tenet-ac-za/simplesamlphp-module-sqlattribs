@@ -1,0 +1,14 @@
+{
+    "name": "ghalse/simplesamlphp-module-sqlattribs",
+    "description": "SimpleSAMLphp module to provide additional attributes from a SQL database",
+    "type": "simplesamlphp-module",
+    "license": "BSD-2-Clause",
+    "authors": [
+        {
+            "name": "Guy Antony Halse"
+        }
+    ]
+    "require": {
+        "simplesamlphp/composer-module-installer": "^1.1"
+    }
+}
