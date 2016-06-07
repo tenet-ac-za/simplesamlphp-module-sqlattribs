@@ -123,6 +123,7 @@ class sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends SimpleSAML_Auth_Pr
     {
         assert('is_array($request)');
         assert('array_key_exists("Attributes", $request)');
+		assert('array_key_exists("entityid", $request["Destination"])');
 
         $attributes =& $request['Attributes'];
 
@@ -134,15 +135,16 @@ class sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends SimpleSAML_Auth_Pr
         $db = $this->connect();
 
         try {
-            $sth = $db->prepare('SELECT attribute,value FROM ' . $this->table . ' WHERE uid=?');
+            $sth = $db->prepare('SELECT attribute,value FROM ' . $this->table . ' WHERE uid=? AND (sp=\'%\' OR sp=?);');
         } catch (PDOException $e) {
             throw new SimpleSAML_Error_Exception('AttributeFromSQL: prepare() failed: ' . $e->getMessage());
         }
 
         try {
-            $res = $sth->execute(array($attributes[$this->attribute][0]));
+            $res = $sth->execute(array($attributes[$this->attribute][0], $request["Destination"]["entityid"]));
         } catch (PDOException $e) {
-            throw new SimpleSAML_Error_Exception('AttributeFromSQL: execute(' . $attributes[$this->attribute][0] . ') failed: ' . $e->getMessage());
+            throw new SimpleSAML_Error_Exception('AttributeFromSQL: execute(' . $attributes[$this->attribute][0] . 
+				', ' . $request["Destination"]["entityid"] . ') failed: ' . $e->getMessage());
         }
 
         try {

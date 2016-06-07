@@ -25,9 +25,10 @@ You then need to create the following table in your SQL database:
 
 ```sql
 CREATE TABLE `AttributeFromSQL` (
-    `uid` varchar(30) NOT NULL,
-    `attribute` varchar(30) NOT NULL,
-    `value` text
+    `uid` VARCHAR(100) NOT NULL,
+	`sp` VARCHAR(250) DEFAULT '%',
+    `attribute` VARCHAR(30) NOT NULL,
+    `value` TEXT
 ) DEFAULT CHARSET=utf8;
 ```
 
@@ -78,11 +79,16 @@ This module provides no interface to add attributes into the
 database. This can be done manually with SQL similar to the following:
 
 ```sql
-INSERT INTO AttributeFromSQL (uid, attribute, value) VALUES ('user@example.org', 'eduPersonEntitlement', 'urn:mace:exampleIdP.org:demoservice:demo-admin');
-INSERT INTO AttributeFromSQL (uid, attribute, value) VALUES ('user@example.org', 'eduPersonEntitlement', 'urn:mace:grnet.gr:eduroam:admin');
-INSERT INTO AttributeFromSQL (uid, attribute, value) VALUES ('user@example.org', 'eduPersonAffiliation', 'faculty');
+INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', '%', 'eduPersonEntitlement', 'urn:mace:exampleIdP.org:demoservice:demo-admin');
+INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', 'https://idp.example.org/idp/shibboleth', 'eduPersonEntitlement', 'urn:mace:grnet.gr:eduroam:admin');
+INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', '%', 'eduPersonAffiliation', 'faculty');
 INSERT INTO AttributeFromSQL (uid, attribute, value) VALUES ('user@example.org', 'mail', 'user@example.org');
 ```
+
+The optional `sp` field (defaults to '%' with the above SQL CREATE) is used 
+to limit which SP sees a particular attribute. The special value `%` 
+is used to indicate all SPs. If you wish to indicate more than one SP but 
+not all, insert multiple lines.
 
 Where multiple attributes of the same name occur, these become a single
 multi-valued attribute. Thus assuming the user `user@example.org`
@@ -114,4 +120,4 @@ $attributes = array(
 ),
 ```
 
-Note that because the the `limit` parameter, the mail attribute was not added. And because `replace` was false, eduPersonAffiliation was merged.
+Note that because the the `limit` parameter, the mail attribute was not added. And because `replace` was false, eduPersonAffiliation was merged. It is assumed that this SP has an Entity Id of `https://sp.example.org/shibboleth-sp` - other SPs would not see the SP-specific eduPersonEntitlement attribute.
