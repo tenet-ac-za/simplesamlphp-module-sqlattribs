@@ -1,5 +1,5 @@
 {
-    "name": "ghalse/simplesamlphp-module-sqlattribs",
+    "name": "safire-ac-za/simplesamlphp-module-sqlattribs",
     "description": "SimpleSAMLphp module to provide additional attributes from a SQL database",
     "type": "simplesamlphp-module",
     "license": "BSD-2-Clause",

@@ -15,7 +15,7 @@ very simple.  Just execute the following command in the root of your
 SimpleSAMLphp installation:
 
 ```
-composer.phar require ghalse/simplesamlphp-module-sqlattribs:dev-master
+composer.phar require safire-ac-za/simplesamlphp-module-sqlattribs:dev-master
 ```
 
 where `dev-master` instructs Composer to install the `master` branch
@@ -85,9 +85,9 @@ INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.o
 INSERT INTO AttributeFromSQL (uid, attribute, value) VALUES ('user@example.org', 'mail', 'user@example.org');
 ```
 
-The optional `sp` field (defaults to '%' with the above SQL CREATE) is used 
-to limit which SP sees a particular attribute. The special value `%` 
-is used to indicate all SPs. If you wish to indicate more than one SP but 
+The optional `sp` field (defaults to '%' with the above SQL CREATE) is used
+to limit which SP sees a particular attribute. The special value `%`
+is used to indicate all SPs. If you wish to indicate more than one SP but
 not all, insert multiple lines.
 
 Where multiple attributes of the same name occur, these become a single
