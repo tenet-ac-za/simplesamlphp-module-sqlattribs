@@ -37,7 +37,8 @@ CREATE TABLE `AttributeFromSQL` (
 Usage
 -----
 
-This module provides the sqlattribs:AttributeFromSQL auth proc filter, which can be used as follows:
+This module provides the _sqlattribs:AttributeFromSQL_ auth proc filter,
+which can be used as follows:
 
 ```php
 50 => array(
@@ -56,9 +57,9 @@ This module provides the sqlattribs:AttributeFromSQL auth proc filter, which can
 
 Where the parameters are as follows:
 
-* `class` - the name of the class, must be `sqlattribs:AttributeFromSQL`
+* `class` - the name of the class, must be _sqlattribs:AttributeFromSQL_
 
-* `attribute` - the attribute to use as the uid/key for database searches, defaults to `eduPersonPrincipalName` if not specified.
+* `attribute` - the attribute to use as the uid/key for database searches, defaults to _eduPersonPrincipalName_ if not specified.
 
 * `limit` - an optional array specifying the attribute names we can add. If not specified, all attributes that are found in the database are added. Defaults to allowing all attributes.
 
@@ -66,13 +67,13 @@ Where the parameters are as follows:
 
 * `database` - an array containing information about the data store, with the following parameters:
 
-  * `dsn` - the data source name, defaults to `mysql:host=localhost;dbname=simplesamlphp`
+  * `dsn` - the data source name, defaults to _mysql:host=localhost;dbname=simplesamlphp_
 
   * `username` - the username to connect to the database, defaults to none (blank username)
 
   * `password` - the password to connect to the database, defaults to none (blank password)
 
-  * `table` - the name of the table/view to search for attributes, defaults to `AttributeFromSQL`
+  * `table` - the name of the table/view to search for attributes, defaults to _AttributeFromSQL_
 
 Adding attributes
 -----------------
@@ -87,13 +88,13 @@ INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.o
 INSERT INTO AttributeFromSQL (uid, attribute, value) VALUES ('user@example.org', 'mail', 'user@example.org');
 ```
 
-The optional `sp` field (defaults to '%' with the above SQL CREATE) is used
+The optional _sp_ field (defaults to '%' with the above SQL CREATE) is used
 to limit which SP sees a particular attribute. The special value `%`
 is used to indicate all SPs. If you wish to indicate more than one SP but
 not all, insert multiple lines.
 
 Where multiple attributes of the same name occur, these become a single
-multi-valued attribute. Thus assuming the user `user@example.org`
+multi-valued attribute. Thus assuming the user _user@example.org_
 started with attributes of:
 
 ```php
@@ -122,4 +123,5 @@ $attributes = array(
 ),
 ```
 
-Note that because the the `limit` parameter, the mail attribute was not added. And because `replace` was false, eduPersonAffiliation was merged. It is assumed that this SP has an Entity Id of `https://sp.example.org/shibboleth-sp` - other SPs would not see the SP-specific eduPersonEntitlement attribute.
+Note that because the the `limit` parameter, the mail attribute was not added. And because `replace` was false, _eduPersonAffiliation_ was merged. It is assumed that this SP has an Entity Id of `https://sp.example.org/shibboleth-sp` - other SPs would not see the SP-specific _eduPersonEntitlement_ attribute.
+
