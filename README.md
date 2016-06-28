@@ -18,8 +18,10 @@ SimpleSAMLphp installation:
 composer.phar require safire-ac-za/simplesamlphp-module-sqlattribs:dev-master
 ```
 
-where `dev-master` instructs Composer to install the `master` branch
-from the Git repository.
+where `dev-master` instructs Composer to install the `master` (**development**)
+branch from the Git repository. See the
+[releases](https://github.com/safire-ac-za/simplesamlphp-module-sqlattribs/releases)
+available if you want to use a stable version of the module.
 
 You then need to create the following table in your SQL database:
 
