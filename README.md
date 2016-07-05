@@ -1,4 +1,4 @@
-sqlattribs:AttributeFromSQL
+sqlattribs:AttributeFromSQL     [![Build Status](https://travis-ci.org/safire-ac-za/simplesamlphp-module-sqlattribs.svg?branch=master)](https://travis-ci.org/safire-ac-za/simplesamlphp-module-sqlattribs)
 ===========================
 
 This SimpleSAMLphp auth proc filter allows you to provides additional
