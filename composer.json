@@ -2,10 +2,11 @@
     "name": "safire-ac-za/simplesamlphp-module-sqlattribs",
     "description": "SimpleSAMLphp module to provide additional attributes from a SQL database",
     "type": "simplesamlphp-module",
-    "license": "BSD-2-Clause",
+    "license": "MIT",
     "authors": [
         {
-            "name": "Guy Antony Halse"
+            "name": "Guy Halse",
+			"homepage": "http://orcid.org/0000-0002-9388-8592"
         }
     ],
     "require": {
