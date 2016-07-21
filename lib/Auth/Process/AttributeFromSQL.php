@@ -38,6 +38,7 @@ class sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends SimpleSAML_Auth_Pr
      *
      * @param array $config Configuration information about this filter.
      * @param mixed $reserved For future use.
+     * @throws SimpleSAML_Error_Exception
      */
     public function __construct($config, $reserved)
     {
@@ -88,14 +89,15 @@ class sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends SimpleSAML_Auth_Pr
      * Create a database connection.
      *
      * @return PDO The database connection.
+     * @throws SimpleSAML_Error_Exception
      */
     private function connect()
     {
         try {
             $db = new PDO($this->dsn, $this->username, $this->password);
         } catch (PDOException $e) {
-            throw new SimpleSAML_Error_Exception('AttributeFromSQL: Failed to connect to \''.
-                $this->dsn . '\': '. $e->getMessage());
+            throw new SimpleSAML_Error_Exception('AttributeFromSQL: Failed to connect to \'' .
+                $this->dsn . '\': ' . $e->getMessage());
         }
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -120,17 +122,18 @@ class sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends SimpleSAML_Auth_Pr
      *
      * Logic is largely the same as (and lifted from) sqlauth:sql
      * @param mixed &$request
+     * @throws SimpleSAML_Error_Exception
      */
     public function process(&$request)
     {
         assert('is_array($request)');
         assert('array_key_exists("Attributes", $request)');
-		assert('array_key_exists("entityid", $request["Destination"])');
+        assert('array_key_exists("entityid", $request["Destination"])');
 
         $attributes =& $request['Attributes'];
 
         if (!array_key_exists($this->attribute, $attributes)) {
-            SimpleSAML_Logger::info('AttributeFromSQL: attribute \'' . $this->attribute . '\' not set, declining');
+            SimpleSAML\Logger::info('AttributeFromSQL: attribute \'' . $this->attribute . '\' not set, declining');
             return;
         }
 
@@ -145,8 +148,8 @@ class sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends SimpleSAML_Auth_Pr
         try {
             $res = $sth->execute(array($attributes[$this->attribute][0], $request["Destination"]["entityid"]));
         } catch (PDOException $e) {
-            throw new SimpleSAML_Error_Exception('AttributeFromSQL: execute(' . $attributes[$this->attribute][0] . 
-				', ' . $request["Destination"]["entityid"] . ') failed: ' . $e->getMessage());
+            throw new SimpleSAML_Error_Exception('AttributeFromSQL: execute(' . $attributes[$this->attribute][0] .
+                ', ' . $request["Destination"]["entityid"] . ') failed: ' . $e->getMessage());
         }
 
         try {
@@ -157,7 +160,7 @@ class sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends SimpleSAML_Auth_Pr
         }
 
         if (count($data) === 0) {
-            SimpleSAML_Logger::info('AttributeFromSQL: no additional attributes for ' . $this->attribute . '=\'' . $attributes[$this->attribute][0] . '\'');
+            SimpleSAML\Logger::info('AttributeFromSQL: no additional attributes for ' . $this->attribute . '=\'' . $attributes[$this->attribute][0] . '\'');
             return;
         }
 
@@ -167,7 +170,7 @@ class sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends SimpleSAML_Auth_Pr
          */
         foreach ($data as $row) {
             if (empty($row['attribute']) || $row['value'] === null) {
-                SimpleSAML_Logger::debug('AttributeFromSQL: skipping invalid attribute/value tuple: ' . var_export($row, true));
+                SimpleSAML\Logger::debug('AttributeFromSQL: skipping invalid attribute/value tuple: ' . var_export($row, true));
                 continue;
             }
 
@@ -176,7 +179,7 @@ class sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends SimpleSAML_Auth_Pr
 
             /* Limit the attribute set returned */
             if ($this->limit !== null && !in_array($name, $this->limit, true)) {
-                SimpleSAML_Logger::notice('AttributeFromSQL: skipping unwanted attribute ' . $name . ' [limited to: ' . var_export($this->limit, true) . ']');
+                SimpleSAML\Logger::notice('AttributeFromSQL: skipping unwanted attribute ' . $name . ' [limited to: ' . var_export($this->limit, true) . ']');
                 continue;
             }
 
@@ -186,7 +189,7 @@ class sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends SimpleSAML_Auth_Pr
 
             if (in_array($value, $attributes[$name], true)) {
                 /* Value already exists in attribute. */
-                SimpleSAML_Logger::debug('AttributeFromSQL: skipping duplicate attribute/value tuple ' . $name . '=\'' . $value . '\'');
+                SimpleSAML\Logger::debug('AttributeFromSQL: skipping duplicate attribute/value tuple ' . $name . '=\'' . $value . '\'');
                 continue;
             }
 
