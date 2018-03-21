@@ -11,6 +11,27 @@ matrix:
   allow_failures:
   - php: hhvm
 
+services:
+ - mysql
+
+# Set up a test database we can use for the the unit tests
+before_install:
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS simplesamlphp;'
+  - mysql -e 'CREATE TABLE `AttributeFromSQL` (
+        `uid` VARCHAR(100) NOT NULL,
+        `sp` VARCHAR(250) DEFAULT "%",
+        `attribute` VARCHAR(30) NOT NULL,
+        `value` TEXT
+    ) DEFAULT CHARSET=utf8;
+    GRANT ALL ON `simplesamlphp`.* TO `phpunit`@`localhost` IDENTIFIED BY "phpunit";
+    ' simplesamlphp
+  - mysql -e "
+    INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', '%', 'eduPersonEntitlement', 'urn:mace:exampleIdP.org:demoservice:demo-admin');
+    INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', 'https://idp.example.org/idp/shibboleth', 'eduPersonEntitlement', 'urn:mace:grnet.gr:eduroam:admin');
+    INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', '%', 'eduPersonAffiliation', 'faculty');
+    INSERT INTO AttributeFromSQL (uid, attribute, value) VALUES ('user@example.org', 'mail', 'user@example.org');
+    " simplesamlphp
+
 before_script:
   composer update --dev
 
