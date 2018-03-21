@@ -14,5 +14,5 @@ matrix:
 before_script:
   composer update --dev
 
-# hack - lets at least test syntax at this stage
-script: php -l lib/Auth/Process/AttributeFromSQL.php
+script:
+  php vendor/phpunit/phpunit/phpunit.php

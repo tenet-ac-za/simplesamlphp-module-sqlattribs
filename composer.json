@@ -11,5 +11,16 @@
     ],
     "require": {
         "simplesamlphp/composer-module-installer": "^1.1"
+    },
+	"require-dev": {
+        "simplesamlphp/simplesamlphp": ">=1.14",
+        "phpunit/phpunit": "~3.7"
+    },
+    "autoload-dev": {
+      "files": ["tests/_autoload_modules.php"]
+    },
+    "support": {
+        "issues": "https://github.com/safire-ac-za/simplesamlphp-module-sqlattribs/issues",
+        "source": "https://github.com/safire-ac-za/simplesamlphp-module-sqlattribs"
     }
 }
