@@ -102,5 +102,4 @@ class Test_sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends \PHPUnit_Fram
         );
         $this->assertEquals($expectedData, $attributes, "Expected data was not correct");
     }
-
 }

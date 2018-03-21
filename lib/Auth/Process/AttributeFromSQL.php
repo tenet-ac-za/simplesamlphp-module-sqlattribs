@@ -197,4 +197,3 @@ class sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends SimpleSAML_Auth_Pr
         }
     }
 }
-
