@@ -19,7 +19,7 @@ class Test_sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends \PHPUnit_Fram
         $filter->process($request);
         return $request;
     }
-    
+
     protected function setUp()
     {
         \SimpleSAML_Configuration::loadFromArray(array(), '[ARRAY]', 'simplesaml');
@@ -99,6 +99,39 @@ class Test_sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends \PHPUnit_Fram
                 'faculty',
             ),
             'mail' => array('user@example.org'),
+        );
+        $this->assertEquals($expectedData, $attributes, "Expected data was not correct");
+    }
+    /**
+     * Test attribute replacement
+     */
+
+    public function testIgnoreExpires()
+    {
+        $config = array(
+            'attribute' => 'eduPersonPrincipalName',
+            'limit' => array('mail',),
+            'ignoreExpiry' => true,
+            'database' => array(
+                'username' => 'phpunit',
+                'password' => 'phpunit',
+            ),
+        );
+        $request = array(
+            'Attributes' => array(
+                'eduPersonPrincipalName' => array('user@example.org'),
+                'displayName' => array('Example User'),
+            ),
+            'Destination' => array(
+                'entityid' => 'https://idp.example.org/idp/shibboleth',
+            ),
+        );
+        $result = self::processFilter($config, $request);
+        $attributes = $result['Attributes'];
+        $expectedData = array(
+            'eduPersonPrincipalName' => array('user@example.org'),
+            'displayName' => array('Example User'),
+            'mail' => array('user@example.org', 'marty@example.org'),
         );
         $this->assertEquals($expectedData, $attributes, "Expected data was not correct");
     }

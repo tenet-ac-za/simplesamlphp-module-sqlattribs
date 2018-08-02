@@ -17,11 +17,14 @@ services:
 # Set up a test database we can use for the the unit tests
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS simplesamlphp;'
-  - mysql -e 'CREATE TABLE `AttributeFromSQL` (
+  - mysql -e 'CREATE TABLE IF NOT EXISTS `AttributeFromSQL` (
+        `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
         `uid` VARCHAR(100) NOT NULL,
         `sp` VARCHAR(250) DEFAULT "%",
         `attribute` VARCHAR(30) NOT NULL,
-        `value` TEXT
+        `value` TEXT,
+        `expires` DATE DEFAULT "9999-12-31",
+        PRIMARY KEY (`id`)
     ) DEFAULT CHARSET=utf8;
     GRANT ALL ON `simplesamlphp`.* TO `phpunit`@`localhost` IDENTIFIED BY "phpunit";
     ' simplesamlphp
@@ -30,6 +33,7 @@ before_install:
     INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', 'https://idp.example.org/idp/shibboleth', 'eduPersonEntitlement', 'urn:mace:grnet.gr:eduroam:admin');
     INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', '%', 'eduPersonAffiliation', 'faculty');
     INSERT INTO AttributeFromSQL (uid, attribute, value) VALUES ('user@example.org', 'mail', 'user@example.org');
+    INSERT INTO AttributeFromSQL (uid, attribute, value, expires) VALUES ('user@example.org', 'mail', 'marty@example.org', '2015-10-21');
     " simplesamlphp
 
 before_script:

@@ -26,12 +26,22 @@ available if you want to use a stable version of the module.
 You then need to create the following table in your SQL database:
 
 ```sql
-CREATE TABLE `AttributeFromSQL` (
+CREATE TABLE IF NOT EXISTS `AttributeFromSQL` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `uid` VARCHAR(100) NOT NULL,
-	`sp` VARCHAR(250) DEFAULT '%',
+    `sp` VARCHAR(250) DEFAULT '%',
     `attribute` VARCHAR(30) NOT NULL,
-    `value` TEXT
+    `value` TEXT,
+    `expires` DATE DEFAULT '9999-12-31',
+     PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8;
+```
+
+Note that if you are upgrading from v1.2 or earlier you need to make the following change to your existing database:
+
+```sql
+ALTER TABLE `AttributeFromSQL` ADD `id` INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST, ADD PRIMARY KEY (id);
+ALTER TABLE `AttributeFromSQL` ADD `expires` DATE DEFAULT '9999-12-31';
 ```
 
 Usage
@@ -65,6 +75,8 @@ Where the parameters are as follows:
 
 * `replace` - behaviour when an existing attribute of the same name is encountered. If `false` (the default) then new values are pushed into an array, creating a multi-valued attribute. If `true`, then existing attributes of the same name are replaced (deleted).
 
+* `ignoreExpiry` - ignore any expiry date (default is to ignore attributes that are beyond the date in the `expires` column).
+
 * `database` - an array containing information about the data store, with the following parameters:
 
   * `dsn` - the data source name, defaults to _mysql:host=localhost;dbname=simplesamlphp_
@@ -84,7 +96,7 @@ database. This can be done manually with SQL similar to the following:
 ```sql
 INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', '%', 'eduPersonEntitlement', 'urn:mace:exampleIdP.org:demoservice:demo-admin');
 INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', 'https://idp.example.org/idp/shibboleth', 'eduPersonEntitlement', 'urn:mace:grnet.gr:eduroam:admin');
-INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', '%', 'eduPersonAffiliation', 'faculty');
+INSERT INTO AttributeFromSQL (uid, sp, attribute, value, expires) VALUES ('user@example.org', '%', 'eduPersonAffiliation', 'faculty', '2020-12-31');
 INSERT INTO AttributeFromSQL (uid, attribute, value) VALUES ('user@example.org', 'mail', 'user@example.org');
 ```
 

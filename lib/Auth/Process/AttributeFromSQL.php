@@ -33,6 +33,9 @@ class sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends SimpleSAML_Auth_Pr
     /** @var array|null Limit returned attribute set */
     private $limit = null;
 
+    /** @var bool|false Should we ignore expiry */
+    private $ignoreExpiry = false;
+
     /**
      * Initialize this filter, parse configuration.
      *
@@ -82,6 +85,10 @@ class sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends SimpleSAML_Auth_Pr
                 throw new SimpleSAML_Error_Exception('AttributeFromSQL: limit must be an array of attribute names');
             }
             $this->limit = $config['limit'];
+        }
+
+        if (array_key_exists('ignoreExpiry', $config)) {
+            $this->ignoreExpiry = (bool)$config['ignoreExpiry'];
         }
     }
 
@@ -140,7 +147,7 @@ class sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends SimpleSAML_Auth_Pr
         $db = $this->connect();
 
         try {
-            $sth = $db->prepare('SELECT attribute,value FROM ' . $this->table . ' WHERE uid=? AND (sp=\'%\' OR sp=?);');
+            $sth = $db->prepare('SELECT `attribute`,`value` FROM ' . $this->table . ' WHERE `uid`=? AND (`sp`=\'%\' OR `sp`=?)' . ($this->ignoreExpiry ? '' : ' AND `expires`>CURRENT_DATE') . ';');
         } catch (PDOException $e) {
             throw new SimpleSAML_Error_Exception('AttributeFromSQL: prepare() failed: ' . $e->getMessage());
         }
