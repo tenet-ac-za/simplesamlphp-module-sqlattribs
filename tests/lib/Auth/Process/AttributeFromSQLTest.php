@@ -1,10 +1,13 @@
 <?php
+namespace SimpleSAML\Test\Module\entattribs\Auth\Process;
+
 // Alias the PHPUnit 6.0 ancestor if available, else fall back to legacy ancestor
 if (class_exists('\PHPUnit\Framework\TestCase', true) and !class_exists('\PHPUnit_Framework_TestCase', true)) {
     class_alias('\PHPUnit\Framework\TestCase', '\PHPUnit_Framework_TestCase', true);
 }
+require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/lib/Auth/Process/AttributeFromSQL.php');
 
-class Test_sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends \PHPUnit_Framework_TestCase
+class AttributeFromSQL extends \PHPUnit_Framework_TestCase
 {
     /**
      * Helper function to run the filter with a given configuration.
@@ -15,14 +18,14 @@ class Test_sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends \PHPUnit_Fram
      */
     private static function processFilter(array $config, array $request)
     {
-        $filter = new \sspmod_sqlattribs_Auth_Process_AttributeFromSQL($config, null);
+        $filter = new \SimpleSAML\Module\sqlattribs\Auth\Process\AttributeFromSQL($config, null);
         $filter->process($request);
         return $request;
     }
 
     protected function setUp()
     {
-        \SimpleSAML_Configuration::loadFromArray(array(), '[ARRAY]', 'simplesaml');
+        \SimpleSAML\Configuration::loadFromArray([], '[ARRAY]', 'simplesaml');
     }
 
     /**
@@ -30,39 +33,39 @@ class Test_sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends \PHPUnit_Fram
      */
     public function testExample()
     {
-        $config = array(
+        $config = [
             'attribute' => 'eduPersonPrincipalName',
-            'limit' => array('eduPersonEntitlement', 'eduPersonAffiliation'),
+            'limit' => ['eduPersonEntitlement', 'eduPersonAffiliation'],
             'replace' => false,
-            'database' => array(
+            'database' => [
                 'username' => 'phpunit',
                 'password' => 'phpunit',
-            ),
-        );
-        $request = array(
-            'Attributes' => array(
-                'eduPersonPrincipalName' => array('user@example.org'),
-                'eduPersonAffiliation' => array('member'),
-                'displayName' => array('Example User'),
-            ),
-            'Destination' => array(
+            ],
+        ];
+        $request = [
+            'Attributes' => [
+                'eduPersonPrincipalName' => ['user@example.org'],
+                'eduPersonAffiliation' => ['member'],
+                'displayName' => ['Example User'],
+            ],
+            'Destination' => [
                 'entityid' => 'https://idp.example.org/idp/shibboleth',
-            ),
-        );
+            ],
+        ];
         $result = self::processFilter($config, $request);
         $attributes = $result['Attributes'];
-        $expectedData = array(
-            'eduPersonPrincipalName' => array('user@example.org'),
-            'displayName' => array('Example User'),
-            'eduPersonEntitlement' => array(
+        $expectedData = [
+            'eduPersonPrincipalName' => ['user@example.org'],
+            'displayName' => ['Example User'],
+            'eduPersonEntitlement' => [
                 'urn:mace:exampleIdP.org:demoservice:demo-admin',
                 'urn:mace:grnet.gr:eduroam:admin',
-            ),
-            'eduPersonAffiliation' => array(
+            ],
+            'eduPersonAffiliation' => [
                 'member',
                 'faculty',
-            ),
-        );
+            ],
+        ];
         $this->assertEquals($expectedData, $attributes, "Expected data was not correct");
     }
 
@@ -71,35 +74,35 @@ class Test_sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends \PHPUnit_Fram
      */
     public function testReplace()
     {
-        $config = array(
+        $config = [
             'attribute' => 'eduPersonPrincipalName',
-            'limit' => array('mail', 'eduPersonAffiliation'),
+            'limit' => ['mail', 'eduPersonAffiliation'],
             'replace' => true,
-            'database' => array(
+            'database' => [
                 'username' => 'phpunit',
                 'password' => 'phpunit',
-            ),
-        );
-        $request = array(
-            'Attributes' => array(
-                'eduPersonPrincipalName' => array('user@example.org'),
-                'eduPersonAffiliation' => array('member'),
-                'displayName' => array('Example User'),
-            ),
-            'Destination' => array(
+            ],
+        ];
+        $request = [
+            'Attributes' => [
+                'eduPersonPrincipalName' => ['user@example.org'],
+                'eduPersonAffiliation' => ['member'],
+                'displayName' => ['Example User'],
+            ],
+            'Destination' => [
                 'entityid' => 'https://idp.example.org/idp/shibboleth',
-            ),
-        );
+            ],
+        ];
         $result = self::processFilter($config, $request);
         $attributes = $result['Attributes'];
-        $expectedData = array(
-            'eduPersonPrincipalName' => array('user@example.org'),
-            'displayName' => array('Example User'),
-            'eduPersonAffiliation' => array(
+        $expectedData = [
+            'eduPersonPrincipalName' => ['user@example.org'],
+            'displayName' => ['Example User'],
+            'eduPersonAffiliation' => [
                 'faculty',
-            ),
-            'mail' => array('user@example.org'),
-        );
+            ],
+            'mail' => ['user@example.org'],
+        ];
         $this->assertEquals($expectedData, $attributes, "Expected data was not correct");
     }
     /**
@@ -108,31 +111,31 @@ class Test_sspmod_sqlattribs_Auth_Process_AttributeFromSQL extends \PHPUnit_Fram
 
     public function testIgnoreExpires()
     {
-        $config = array(
+        $config = [
             'attribute' => 'eduPersonPrincipalName',
-            'limit' => array('mail',),
+            'limit' => ['mail',],
             'ignoreExpiry' => true,
-            'database' => array(
+            'database' => [
                 'username' => 'phpunit',
                 'password' => 'phpunit',
-            ),
-        );
-        $request = array(
-            'Attributes' => array(
-                'eduPersonPrincipalName' => array('user@example.org'),
-                'displayName' => array('Example User'),
-            ),
-            'Destination' => array(
+            ],
+        ];
+        $request = [
+            'Attributes' => [
+                'eduPersonPrincipalName' => ['user@example.org'],
+                'displayName' => ['Example User'],
+            ],
+            'Destination' => [
                 'entityid' => 'https://idp.example.org/idp/shibboleth',
-            ),
-        );
+            ],
+        ];
         $result = self::processFilter($config, $request);
         $attributes = $result['Attributes'];
-        $expectedData = array(
-            'eduPersonPrincipalName' => array('user@example.org'),
-            'displayName' => array('Example User'),
-            'mail' => array('user@example.org', 'marty@example.org'),
-        );
+        $expectedData = [
+            'eduPersonPrincipalName' => ['user@example.org'],
+            'displayName' => ['Example User'],
+            'mail' => ['user@example.org', 'marty@example.org'],
+        ];
         $this->assertEquals($expectedData, $attributes, "Expected data was not correct");
     }
 }

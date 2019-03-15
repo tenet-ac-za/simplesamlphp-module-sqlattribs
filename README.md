@@ -51,18 +51,18 @@ This module provides the _sqlattribs:AttributeFromSQL_ auth proc filter,
 which can be used as follows:
 
 ```php
-50 => array(
+50 => [
     'class'     => 'sqlattribs:AttributeFromSQL',
     'attribute' => 'eduPersonPrincipalName',
-    'limit'     => array('eduPersonEntitlement', 'eduPersonAffiliation'),
+    'limit'     => ['eduPersonEntitlement', 'eduPersonAffiliation'],
     'replace'   => false,
-    'database'  => array(
+    'database'  => [
         'dsn'       => 'mysql:host=localhost;dbname=simplesamlphp',
         'username'  => 'yourDbUsername',
         'password'  => 'yourDbPassword',
         'table'     => 'AttributeFromSQL',
-    ),
-),
+    ],
+],
 ```
 
 Where the parameters are as follows:
@@ -110,29 +110,29 @@ multi-valued attribute. Thus assuming the user _user@example.org_
 started with attributes of:
 
 ```php
-$attributes = array(
+$attributes = [
    'eduPersonPrincipalName' => 'user@example.org',
-   'eduPersonAffiliation' => array('member'),
+   'eduPersonAffiliation' => ['member'],
    'displayName' => 'Example User',
-),
+],
 ```
 
 The the above SQL table and example auth proc filter would lead to a
 combined attribute set of:
 
 ```php
-$attributes = array(
+$attributes = [
     'eduPersonPrincipalName' => 'user@example.org',
     'displayName' => 'Example User',
-    'eduPersonEntitlement' => array(
+    'eduPersonEntitlement' => [
         'urn:mace:exampleIdP.org:demoservice:demo-admin',
         'urn:mace:grnet.gr:eduroam:admin',
-    ),
-    'eduPersonAffiliation' => array(
+    ],
+    'eduPersonAffiliation' => [
         'member',
         'faculty',
-    ),
-),
+    ],
+],
 ```
 
 Note that because the the `limit` parameter, the mail attribute was not added. And because `replace` was false, _eduPersonAffiliation_ was merged. It is assumed that this SP has an Entity Id of `https://sp.example.org/shibboleth-sp` - other SPs would not see the SP-specific _eduPersonEntitlement_ attribute.

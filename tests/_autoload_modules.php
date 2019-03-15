@@ -1,13 +1,6 @@
 <?php
-
 /**
- * This file implements a trimmed down version of the SSP module aware autoloader that can be used in tests.
- *
- * @author Patrick Radtke
- */
-
-/**
- * Autoload function for local SimpleSAMLphp modules.
+ * This file implements a trimmed down version of the SSP module aware autoloader that can be used in tests..
  *
  * @param string $className Name of the class.
  */
@@ -20,14 +13,13 @@ function SimpleSAML_test_module_autoload($className)
     }
 
     $modNameEnd = strpos($className, '_', $modulePrefixLength);
-    $moduleClass = substr($className, $modNameEnd + 1);
+    $module = substr($className, $modulePrefixLength, $modNameEnd - $modulePrefixLength);
+    $path = explode('_', substr($className, $modNameEnd + 1));
+    $file = dirname(dirname(__FILE__)).'/lib/'.join('/', $path).'.php';
 
-    $file = dirname(dirname(__FILE__)) . '/lib/' . str_replace('_', '/', $moduleClass) . '.php';
-
-    if (file_exists($file)) {
-        require_once($file);
+    if (!file_exists($file)) {
+        return;
     }
+    require_once($file);
 }
-
 spl_autoload_register('SimpleSAML_test_module_autoload');
-
