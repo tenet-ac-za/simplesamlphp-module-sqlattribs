@@ -105,10 +105,10 @@ class AttributeFromSQL extends \PHPUnit_Framework_TestCase
         ];
         $this->assertEquals($expectedData, $attributes, "Expected data was not correct");
     }
+
     /**
      * Test attribute replacement
      */
-
     public function testIgnoreExpires()
     {
         $config = [
