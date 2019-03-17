@@ -2,6 +2,7 @@
     "name": "safire-ac-za/simplesamlphp-module-sqlattribs",
     "description": "SimpleSAMLphp module to provide additional attributes from a SQL database",
     "type": "simplesamlphp-module",
+    "keywords": ["simplesamlphp", "sqlattribs", "PDO", "SQL"],
     "license": "MIT",
     "authors": [
         {
@@ -17,8 +18,15 @@
         "simplesamlphp/simplesamlphp": ">=1.17",
         "phpunit/phpunit": "~4.8"
     },
+    "autoload": {
+        "psr-4": {
+            "SimpleSAML\\Module\\sqlattribs\\": "lib/"
+        }
+    },
     "autoload-dev": {
-      "files": ["tests/_autoload_modules.php"]
+        "psr-4": {
+            "SimpleSAML\\Test\\Utils\\": "vendor/simplesamlphp/simplesamlphp/tests/Utils"
+        }
     },
     "support": {
         "issues": "https://github.com/safire-ac-za/simplesamlphp-module-sqlattribs/issues",
