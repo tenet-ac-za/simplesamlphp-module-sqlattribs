@@ -1,5 +1,7 @@
-sqlattribs:AttributeFromSQL     [![Build Status](https://travis-ci.org/safire-ac-za/simplesamlphp-module-sqlattribs.svg?branch=master)](https://travis-ci.org/safire-ac-za/simplesamlphp-module-sqlattribs)
+sqlattribs:AttributeFromSQL
 ===========================
+[![Build Status](https://travis-ci.org/safire-ac-za/simplesamlphp-module-sqlattribs.svg?branch=master)](https://travis-ci.org/safire-ac-za/simplesamlphp-module-sqlattribs)
+[![Coverage Status](https://img.shields.io/coveralls/safire-ac-za/simplesamlphp-module-sqlattribs.svg)](https://coveralls.io/r/safire-ac-za/simplesamlphp-module-sqlattribs)
 
 This SimpleSAMLphp auth proc filter allows you to provides additional
 attributes from a SQL datastore. It is useful in situations where your
