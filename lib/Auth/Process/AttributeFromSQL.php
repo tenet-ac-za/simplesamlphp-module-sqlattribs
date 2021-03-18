@@ -8,8 +8,8 @@ namespace SimpleSAML\Module\sqlattribs\Auth\Process;
  * This filter allows you to add attributes from a SQL datasource
  *
  * @author    Guy Halse, http://orcid.org/0000-0002-9388-8592
- * @copyright Copyright (c) 2019, SAFIRE - South African Identity Federation
- * @license   https://github.com/safire-ac-za/simplesamlphp-module-sqlattribs/blob/master/LICENSE MIT License
+ * @copyright Copyright (c) 2019, Tertiary Education and Research Network of South Africa
+ * @license   https://github.com/tenet-ac-za/simplesamlphp-module-sqlattribs/blob/master/LICENSE MIT License
  * @package   SimpleSAMLphp
  */
 class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter

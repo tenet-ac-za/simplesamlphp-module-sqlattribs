@@ -1,7 +1,7 @@
 sqlattribs:AttributeFromSQL
 ===========================
-[![Build Status](https://travis-ci.org/safire-ac-za/simplesamlphp-module-sqlattribs.svg?branch=master)](https://travis-ci.org/safire-ac-za/simplesamlphp-module-sqlattribs)
-[![Coverage Status](https://img.shields.io/coveralls/safire-ac-za/simplesamlphp-module-sqlattribs.svg)](https://coveralls.io/r/safire-ac-za/simplesamlphp-module-sqlattribs)
+[![Build Status](https://travis-ci.org/tenet-ac-za/simplesamlphp-module-sqlattribs.svg?branch=master)](https://travis-ci.org/tenet-ac-za/simplesamlphp-module-sqlattribs)
+[![Coverage Status](https://img.shields.io/coveralls/tenet-ac-za/simplesamlphp-module-sqlattribs.svg)](https://coveralls.io/r/tenet-ac-za/simplesamlphp-module-sqlattribs)
 
 This SimpleSAMLphp auth proc filter allows you to provides additional
 attributes from a SQL datastore. It is useful in situations where your
@@ -22,7 +22,7 @@ composer.phar require safire-ac-za/simplesamlphp-module-sqlattribs:dev-master
 
 where `dev-master` instructs Composer to install the `master` (**development**)
 branch from the Git repository. See the
-[releases](https://github.com/safire-ac-za/simplesamlphp-module-sqlattribs/releases)
+[releases](https://github.com/tenet-ac-za/simplesamlphp-module-sqlattribs/releases)
 available if you want to use a stable version of the module.
 
 You then need to create the following table in your SQL database:

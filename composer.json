@@ -34,7 +34,7 @@
         }
     },
     "support": {
-        "issues": "https://github.com/safire-ac-za/simplesamlphp-module-sqlattribs/issues",
-        "source": "https://github.com/safire-ac-za/simplesamlphp-module-sqlattribs"
+        "issues": "https://github.com/tenet-ac-za/simplesamlphp-module-sqlattribs/issues",
+        "source": "https://github.com/tenet-ac-za/simplesamlphp-module-sqlattribs"
     }
 }
