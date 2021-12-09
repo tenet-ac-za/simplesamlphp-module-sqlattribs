@@ -13,10 +13,35 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        operating-system: [ubuntu-latest, windows-latest]
+        operating-system: [ubuntu-latest]
         php-versions: ['7.4', '8.0']
 
     steps:
+      - name: Setup test MySQL database
+        run: |
+          sudo systemctl start mysql.service
+          mysql -uroot -proot -e 'CREATE DATABASE IF NOT EXISTS simplesamlphp;'
+          mysql -uroot -proot -e '
+            CREATE TABLE IF NOT EXISTS `AttributeFromSQL` (
+              `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+              `uid` VARCHAR(100) NOT NULL,
+              `sp` VARCHAR(250) DEFAULT "%",
+              `attribute` VARCHAR(30) NOT NULL,
+              `value` TEXT,
+              `expires` DATE DEFAULT "9999-12-31",
+              PRIMARY KEY (`id`)
+            ) DEFAULT CHARSET=utf8;
+            CREATE USER IF NOT EXISTS `phpunit`@`localhost` IDENTIFIED BY "phpunit";
+            GRANT ALL ON `simplesamlphp`.* TO `phpunit`@`localhost`;
+          ' simplesamlphp
+          mysql -uroot -proot -e "
+            INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', '%', 'eduPersonEntitlement', 'urn:mace:exampleIdP.org:demoservice:demo-admin');
+            INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', 'https://idp.example.org/idp/shibboleth', 'eduPersonEntitlement', 'urn:mace:grnet.gr:eduroam:admin');
+            INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', '%', 'eduPersonAffiliation', 'faculty');
+            INSERT INTO AttributeFromSQL (uid, attribute, value) VALUES ('user@example.org', 'mail', 'user@example.org');
+            INSERT INTO AttributeFromSQL (uid, attribute, value, expires) VALUES ('user@example.org', 'mail', 'marty@example.org', '2015-10-21');
+          " simplesamlphp
+
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
         with:
