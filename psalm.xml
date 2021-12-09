@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <psalm
-    name="simplesaml-module-sqlattribs"
+    name="simplesaml-module-safire"
     useDocblockTypes="true"
     totallyTyped="false"
     hideExternalErrors="true"
+    allowStringToStandInForClass="true"
 >
     <projectFiles>
         <directory name="lib" />
@@ -28,7 +29,6 @@
         <MissingReturnType errorLevel="info" />
         <MissingPropertyType errorLevel="info" />
         <InvalidDocblock errorLevel="info" />
-        <MisplacedRequiredParam errorLevel="info" />
 
         <PropertyNotSetInConstructor errorLevel="info" />
         <MissingConstructor errorLevel="info" />

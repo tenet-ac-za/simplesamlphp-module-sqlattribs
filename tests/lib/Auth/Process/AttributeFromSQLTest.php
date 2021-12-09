@@ -2,7 +2,9 @@
 
 namespace SimpleSAML\Test\Module\entattribs\Auth\Process;
 
-class AttributeFromSQL extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class AttributeFromSQL extends TestCase
 {
     /**
      * Helper function to run the filter with a given configuration.
@@ -18,7 +20,7 @@ class AttributeFromSQL extends \PHPUnit_Framework_TestCase
         return $request;
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         \SimpleSAML\Configuration::loadFromArray([], '[ARRAY]', 'simplesaml');
     }

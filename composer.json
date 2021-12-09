@@ -11,12 +11,12 @@
         }
     ],
     "require": {
-        "php": ">=5.6",
-        "simplesamlphp/composer-module-installer": "^1.1"
+        "php": ">=7.4",
+        "simplesamlphp/composer-module-installer": "~1.1"
     },
 	"require-dev": {
-        "simplesamlphp/simplesamlphp": ">=1.17",
-        "phpunit/phpunit": "~5.7"
+        "simplesamlphp/simplesamlphp": ">=1.19",
+        "simplesamlphp/simplesamlphp-test-framework": "~0.1.0"
     },
     "suggest": {
         "ext-pdo": "Needed for database backend",
@@ -26,11 +26,6 @@
     "autoload": {
         "psr-4": {
             "SimpleSAML\\Module\\sqlattribs\\": "lib/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "SimpleSAML\\Test\\Utils\\": "vendor/simplesamlphp/simplesamlphp/tests/Utils"
         }
     },
     "support": {
