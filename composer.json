@@ -10,6 +10,15 @@
 			"homepage": "http://orcid.org/0000-0002-9388-8592"
         }
     ],
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true,
+        "allow-plugins": {
+            "simplesamlphp/composer-module-installer": true
+        }
+    },
     "require": {
         "php": ">=7.4",
         "simplesamlphp/composer-module-installer": "~1.1"
@@ -31,14 +40,5 @@
     "support": {
         "issues": "https://github.com/tenet-ac-za/simplesamlphp-module-sqlattribs/issues",
         "source": "https://github.com/tenet-ac-za/simplesamlphp-module-sqlattribs"
-    },
-    "config": {
-        "preferred-install": {
-            "*": "dist"
-        },
-        "sort-packages": true,
-        "allow-plugins": {
-            "simplesamlphp/composer-module-installer": true
-        }
     }
 }
