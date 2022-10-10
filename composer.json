@@ -31,5 +31,14 @@
     "support": {
         "issues": "https://github.com/tenet-ac-za/simplesamlphp-module-sqlattribs/issues",
         "source": "https://github.com/tenet-ac-za/simplesamlphp-module-sqlattribs"
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true,
+        "allow-plugins": {
+            "simplesamlphp/composer-module-installer": true
+        }
     }
 }
