@@ -50,7 +50,6 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
     public function __construct($config, $reserved)
     {
         parent::__construct($config, $reserved);
-        assert(is_array($config));
 
         if (array_key_exists('attribute', $config)) {
             $this->attribute = $config['attribute'];
@@ -107,7 +106,8 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
         try {
             $db = new \PDO($this->dsn, $this->username, $this->password);
         } catch (\PDOException $e) {
-            throw new \SimpleSAML\Error\Exception('AttributeFromSQL: Failed to connect to \'' .
+            throw new \SimpleSAML\Error\Exception(
+                'AttributeFromSQL: Failed to connect to \'' .
                 $this->dsn . '\': ' . $e->getMessage()
             );
         }
@@ -133,17 +133,17 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
      * Process this filter
      *
      * Logic is largely the same as (and lifted from) sqlauth:sql
-     * @param mixed &$request
+     * @param mixed &$state
      * @throws \SimpleSAML\Error\Exception
      * @return void
      */
-    public function process(&$request): void
+    public function process(&$state): void
     {
-        assert(is_array($request));
-        assert(array_key_exists("Attributes", $request));
-        assert(array_key_exists("entityid", $request["Destination"]));
+        assert(is_array($state));
+        assert(array_key_exists("Attributes", $state));
+        assert(array_key_exists("entityid", $state["Destination"]));
 
-        $attributes =& $request['Attributes'];
+        $attributes =& $state['Attributes'];
 
         if (!array_key_exists($this->attribute, $attributes)) {
             \SimpleSAML\Logger::info('AttributeFromSQL: attribute \'' . $this->attribute . '\' not set, declining');
@@ -165,17 +165,16 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
         }
 
         try {
-            $res = $sth->execute([$attributes[$this->attribute][0], $request["Destination"]["entityid"]]);
+            $res = $sth->execute([$attributes[$this->attribute][0], $state["Destination"]["entityid"]]);
         } catch (\PDOException $e) {
             throw new \SimpleSAML\Error\Exception(
                 'AttributeFromSQL: execute(' . $attributes[$this->attribute][0] .
-                ', ' . $request["Destination"]["entityid"] . ') failed: ' . $e->getMessage()
+                ', ' . $state["Destination"]["entityid"] . ') failed: ' . $e->getMessage()
             );
         }
 
         try {
             $data = $sth->fetchAll(\PDO::FETCH_ASSOC);
-
         } catch (\PDOException $e) {
             throw new \SimpleSAML\Error\Exception('AttributeFromSQL: fetchAll() failed: ' . $e->getMessage());
         }
@@ -194,7 +193,10 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
          */
         foreach ($data as $row) {
             if (empty($row['attribute']) || $row['value'] === null) {
-                \SimpleSAML\Logger::debug('AttributeFromSQL: skipping invalid attribute/value tuple: ' . var_export($row, true));
+                \SimpleSAML\Logger::debug(
+                    'AttributeFromSQL: skipping invalid attribute/value tuple: '
+                    . var_export($row, true)
+                );
                 continue;
             }
 

@@ -28,7 +28,7 @@ class AttributeFromSQL extends TestCase
     /**
      * Test the example from docs
      */
-    public function testExample()
+    public function testExample(): void
     {
         $config = [
             'attribute' => 'eduPersonPrincipalName',
@@ -69,7 +69,7 @@ class AttributeFromSQL extends TestCase
     /**
      * Test attribute replacement
      */
-    public function testReplace()
+    public function testReplace(): void
     {
         $config = [
             'attribute' => 'eduPersonPrincipalName',
@@ -106,7 +106,7 @@ class AttributeFromSQL extends TestCase
     /**
      * Test attribute replacement
      */
-    public function testIgnoreExpires()
+    public function testIgnoreExpires(): void
     {
         $config = [
             'attribute' => 'eduPersonPrincipalName',
