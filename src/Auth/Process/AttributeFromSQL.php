@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SimpleSAML\Module\sqlattribs\Auth\Process;
 
 /**
@@ -135,7 +137,7 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
      * @throws \SimpleSAML\Error\Exception
      * @return void
      */
-    public function process(&$request)
+    public function process(&$request): void
     {
         assert(is_array($request));
         assert(array_key_exists("Attributes", $request));

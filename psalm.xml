@@ -5,11 +5,8 @@
     totallyTyped="false"
 >
     <projectFiles>
-        <!-- <directory name="config-templates" /> -->
-        <directory name="hooks" />
-        <directory name="lib" />
-        <directory name="templates" />
-        <directory name="www" />
+        <directory name="src" />
+        <directory name="tests" />
     </projectFiles>
 
     <issueHandlers>
@@ -22,7 +19,6 @@
         <MissingReturnType errorLevel="info" />
         <MissingPropertyType errorLevel="info" />
         <InvalidDocblock errorLevel="info" />
-        <MisplacedRequiredParam errorLevel="info" />
 
         <PropertyNotSetInConstructor errorLevel="info" />
         <MissingConstructor errorLevel="info" />
@@ -30,5 +26,12 @@
         <MissingParamType errorLevel="info" />
         <UnusedClass errorLevel="info" />
         <PossiblyUnusedMethod errorLevel="info" />
+
+        <!-- Ignore UnresolvableInclude on CLI-scripts -->
+        <UnresolvableInclude>
+            <errorLevel type="suppress">
+                <file name="tests/bootstrap.php" />
+            </errorLevel>
+        </UnresolvableInclude>
     </issueHandlers>
 </psalm>
