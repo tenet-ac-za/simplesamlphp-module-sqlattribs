@@ -1,10 +1,10 @@
 <?php
 
-namespace SimpleSAML\Test\Module\entattribs\Auth\Process;
+namespace SimpleSAML\Test\Module\sqlattribs\Auth\Process;
 
 use PHPUnit\Framework\TestCase;
 
-class AttributeFromSQL extends TestCase
+final class AttributeFromSQLTest extends TestCase
 {
     /**
      * Helper function to run the filter with a given configuration.
@@ -13,7 +13,7 @@ class AttributeFromSQL extends TestCase
      * @param  array $request The request state.
      * @return array  The state array after processing.
      */
-    private static function processFilter(array $config, array $request)
+    private static function processFilter(array $config, array $request): array
     {
         $filter = new \SimpleSAML\Module\sqlattribs\Auth\Process\AttributeFromSQL($config, null);
         $filter->process($request);
