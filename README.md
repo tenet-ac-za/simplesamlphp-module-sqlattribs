@@ -55,7 +55,7 @@ which can be used as follows:
 ```php
 50 => [
     'class'     => 'sqlattribs:AttributeFromSQL',
-    'attribute' => 'eduPersonPrincipalName',
+    'identifyingAttribute' => 'eduPersonPrincipalName',
     'limit'     => ['eduPersonEntitlement', 'eduPersonAffiliation'],
     'replace'   => false,
     'database'  => [
@@ -71,7 +71,7 @@ Where the parameters are as follows:
 
 * `class` - the name of the class, must be _sqlattribs:AttributeFromSQL_
 
-* `attribute` - the attribute to use as the uid/key for database searches, defaults to _eduPersonPrincipalName_ if not specified.
+* `identifyingAttribute` - the attribute to use as the uid/key for database searches, defaults to _eduPersonPrincipalName_ if not specified.
 
 * `limit` - an optional array specifying the attribute names we can add. If not specified, all attributes that are found in the database are added. Defaults to allowing all attributes.
 

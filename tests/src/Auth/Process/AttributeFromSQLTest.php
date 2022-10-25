@@ -31,7 +31,7 @@ class AttributeFromSQL extends TestCase
     public function testExample(): void
     {
         $config = [
-            'attribute' => 'eduPersonPrincipalName',
+            'identifyingAttribute' => 'eduPersonPrincipalName',
             'limit' => ['eduPersonEntitlement', 'eduPersonAffiliation'],
             'replace' => false,
             'database' => [
@@ -72,7 +72,7 @@ class AttributeFromSQL extends TestCase
     public function testReplace(): void
     {
         $config = [
-            'attribute' => 'eduPersonPrincipalName',
+            'identifyingAttribute' => 'eduPersonPrincipalName',
             'limit' => ['mail', 'eduPersonAffiliation'],
             'replace' => true,
             'database' => [
@@ -109,7 +109,7 @@ class AttributeFromSQL extends TestCase
     public function testIgnoreExpires(): void
     {
         $config = [
-            'attribute' => 'eduPersonPrincipalName',
+            'identifyingAttribute' => 'eduPersonPrincipalName',
             'limit' => ['mail',],
             'ignoreExpiry' => true,
             'database' => [

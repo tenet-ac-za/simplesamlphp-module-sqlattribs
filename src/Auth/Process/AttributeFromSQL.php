@@ -29,7 +29,7 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
     private $table = 'AttributeFromSQL';
 
     /** @var string Username/UID attribute. */
-    private $attribute = 'eduPersonPrincipalName';
+    private $identifyingAttribute = 'eduPersonPrincipalName';
 
     /** @var bool|false Should we replace existing attributes? */
     private $replace = false;
@@ -51,11 +51,11 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
     {
         parent::__construct($config, $reserved);
 
-        if (array_key_exists('attribute', $config)) {
-            $this->attribute = $config['attribute'];
+        if (array_key_exists('identifyingAttribute', $config)) {
+            $this->identifyingAttribute = $config['identifyingAttribute'];
         }
-        if (!is_string($this->attribute) || !$this->attribute) {
-            throw new \SimpleSAML\Error\Exception('AttributeFromSQL: attribute name not valid');
+        if (!is_string($this->identifyingAttribute) || !$this->identifyingAttribute) {
+            throw new \SimpleSAML\Error\Exception('AttributeFromSQL: identifyingAttribute name not valid');
         }
 
         if (array_key_exists('database', $config)) {
@@ -145,8 +145,8 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
 
         $attributes =& $state['Attributes'];
 
-        if (!array_key_exists($this->attribute, $attributes)) {
-            \SimpleSAML\Logger::info('AttributeFromSQL: attribute \'' . $this->attribute . '\' not set, declining');
+        if (!array_key_exists($this->identifyingAttribute, $attributes)) {
+            \SimpleSAML\Logger::info('AttributeFromSQL: attribute \'' . $this->identifyingAttribute . '\' not set, declining');
             return;
         }
 
@@ -165,10 +165,10 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
         }
 
         try {
-            $res = $sth->execute([$attributes[$this->attribute][0], $state["Destination"]["entityid"]]);
+            $res = $sth->execute([$attributes[$this->identifyingAttribute][0], $state["Destination"]["entityid"]]);
         } catch (\PDOException $e) {
             throw new \SimpleSAML\Error\Exception(
-                'AttributeFromSQL: execute(' . $attributes[$this->attribute][0] .
+                'AttributeFromSQL: execute(' . $attributes[$this->identifyingAttribute][0] .
                 ', ' . $state["Destination"]["entityid"] . ') failed: ' . $e->getMessage()
             );
         }
@@ -182,7 +182,7 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
         if (count($data) === 0) {
             \SimpleSAML\Logger::info(
                 'AttributeFromSQL: no additional attributes for ' .
-                $this->attribute . '=\'' . $attributes[$this->attribute][0] . '\''
+                $this->identifyingAttribute . '=\'' . $attributes[$this->identifyingAttribute][0] . '\''
             );
             return;
         }
