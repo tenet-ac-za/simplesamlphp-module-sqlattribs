@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace SimpleSAML\Module\sqlattribs\Auth\Process;
 
+use SimpleSAML\Logger;
+
 /**
  * Filter to add attributes from a SQL data source
  *
@@ -17,28 +19,28 @@ namespace SimpleSAML\Module\sqlattribs\Auth\Process;
 class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
 {
     /** @var string The DSN we should connect to. */
-    private $dsn = 'mysql:host=localhost;dbname=simplesamlphp';
+    private string $dsn = 'mysql:host=localhost;dbname=simplesamlphp';
 
     /** @var string The username we should connect to the database with. */
-    private $username;
+    private ?string $username;
 
     /** @var string The password we should connect to the database with. */
-    private $password;
+    private ?string $password;
 
     /** @var string The name of the database table to use. */
-    private $table = 'AttributeFromSQL';
+    private string $table = 'AttributeFromSQL';
 
     /** @var string Username/UID attribute. */
-    private $identifyingAttribute = 'eduPersonPrincipalName';
+    private string $identifyingAttribute = 'eduPersonPrincipalName';
 
     /** @var bool|false Should we replace existing attributes? */
-    private $replace = false;
+    private bool $replace;
 
     /** @var array|null Limit returned attribute set */
-    private $limit = null;
+    private ?array $limit = null;
 
     /** @var bool|false Should we ignore expiry */
-    private $ignoreExpiry = false;
+    private bool $ignoreExpiry;
 
     /**
      * Initialize this filter, parse configuration.
@@ -47,7 +49,7 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
      * @param mixed $reserved For future use.
      * @throws \SimpleSAML\Error\Exception
      */
-    public function __construct($config, $reserved)
+    public function __construct(array $config, $reserved)
     {
         parent::__construct($config, $reserved);
 
@@ -81,6 +83,8 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
 
         if (array_key_exists('replace', $config)) {
             $this->replace = (bool)$config['replace'];
+        } else {
+            $this->replace = false;
         }
 
         if (array_key_exists('limit', $config)) {
@@ -92,6 +96,8 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
 
         if (array_key_exists('ignoreExpiry', $config)) {
             $this->ignoreExpiry = (bool)$config['ignoreExpiry'];
+        } else {
+            $this->ignoreExpiry = false;
         }
     }
 
@@ -101,7 +107,7 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
      * @return \PDO The database connection.
      * @throws \SimpleSAML\Error\Exception
      */
-    private function connect()
+    private function connect(): \PDO
     {
         try {
             $db = new \PDO($this->dsn, $this->username, $this->password);
@@ -137,16 +143,15 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
      * @throws \SimpleSAML\Error\Exception
      * @return void
      */
-    public function process(&$state): void
+    public function process(array &$state): void
     {
-        assert(is_array($state));
         assert(array_key_exists("Attributes", $state));
         assert(array_key_exists("entityid", $state["Destination"]));
 
         $attributes =& $state['Attributes'];
 
         if (!array_key_exists($this->identifyingAttribute, $attributes)) {
-            \SimpleSAML\Logger::info('AttributeFromSQL: attribute \'' . $this->identifyingAttribute . '\' not set, declining');
+            Logger::info('AttributeFromSQL: attribute \'' . $this->identifyingAttribute . '\' not set, declining');
             return;
         }
 
@@ -180,7 +185,7 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
         }
 
         if (count($data) === 0) {
-            \SimpleSAML\Logger::info(
+            Logger::info(
                 'AttributeFromSQL: no additional attributes for ' .
                 $this->identifyingAttribute . '=\'' . $attributes[$this->identifyingAttribute][0] . '\''
             );
@@ -193,7 +198,7 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
          */
         foreach ($data as $row) {
             if (empty($row['attribute']) || $row['value'] === null) {
-                \SimpleSAML\Logger::debug(
+                Logger::debug(
                     'AttributeFromSQL: skipping invalid attribute/value tuple: '
                     . var_export($row, true)
                 );
@@ -205,9 +210,9 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
 
             /* Limit the attribute set returned */
             if ($this->limit !== null && !in_array($name, $this->limit, true)) {
-                \SimpleSAML\Logger::notice(
+                Logger::notice(
                     'AttributeFromSQL: skipping unwanted attribute ' .
-                    $name . ' [limited to: ' . var_export($this->limit, true) . ']'
+                    $name . ' [limited to: ' . join(', ', $this->limit) . ']'
                 );
                 continue;
             }
@@ -218,7 +223,7 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
 
             if (in_array($value, $attributes[$name], true)) {
                 /* Value already exists in attribute. */
-                \SimpleSAML\Logger::debug(
+                Logger::debug(
                     'AttributeFromSQL: skipping duplicate attribute/value tuple ' .
                     $name . '=\'' . $value . '\''
                 );
