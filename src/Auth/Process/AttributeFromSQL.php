@@ -6,7 +6,7 @@ namespace SimpleSAML\Module\sqlattribs\Auth\Process;
 
 use SimpleSAML\Assert\Assert;
 use SimpleSAML\Auth;
-use SimpleSMAL\Error;
+use SimpleSAML\Error;
 use SimpleSAML\Logger;
 
 /**
