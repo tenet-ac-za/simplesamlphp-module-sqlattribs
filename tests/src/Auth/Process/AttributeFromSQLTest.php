@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace SimpleSAML\Test\Module\sqlattribs\Auth\Process;
 
 use PHPUnit\Framework\TestCase;
+use SimpleSAML\Configuration;
+use SimpleSAML\Module\sqlattribs\Auth\Process\AttributeFromSQL;
 
 final class AttributeFromSQLTest extends TestCase
 {
@@ -17,14 +19,14 @@ final class AttributeFromSQLTest extends TestCase
      */
     private static function processFilter(array $config, array $request): array
     {
-        $filter = new \SimpleSAML\Module\sqlattribs\Auth\Process\AttributeFromSQL($config, null);
+        $filter = new AttributeFromSQL($config, null);
         $filter->process($request);
         return $request;
     }
 
     protected function setUp(): void
     {
-        \SimpleSAML\Configuration::loadFromArray([], '[ARRAY]', 'simplesaml');
+        Configuration::loadFromArray([], '[ARRAY]', 'simplesaml');
     }
 
     /**

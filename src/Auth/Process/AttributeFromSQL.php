@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace SimpleSAML\Module\sqlattribs\Auth\Process;
 
 use SimpleSAML\Assert\Assert;
+use SimpleSAML\Auth;
+use SimpleSMAL\Error;
 use SimpleSAML\Logger;
 
 /**
@@ -17,7 +19,7 @@ use SimpleSAML\Logger;
  * @license   https://github.com/tenet-ac-za/simplesamlphp-module-sqlattribs/blob/master/LICENSE MIT License
  * @package   SimpleSAMLphp
  */
-class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
+class AttributeFromSQL extends Auth\ProcessingFilter
 {
     /** @var string The DSN we should connect to. */
     private string $dsn = 'mysql:host=localhost;dbname=simplesamlphp';
@@ -58,7 +60,7 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
             $this->identifyingAttribute = $config['identifyingAttribute'];
         }
         if (!is_string($this->identifyingAttribute) || !$this->identifyingAttribute) {
-            throw new \SimpleSAML\Error\Exception('AttributeFromSQL: identifyingAttribute name not valid');
+            throw new Error\Exception('AttributeFromSQL: identifyingAttribute name not valid');
         }
 
         if (array_key_exists('database', $config)) {
@@ -76,10 +78,10 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
             }
         }
         if (!is_string($this->dsn) || !$this->dsn) {
-            throw new \SimpleSAML\Error\Exception('AttributeFromSQL: invalid database DSN given');
+            throw new Error\Exception('AttributeFromSQL: invalid database DSN given');
         }
         if (!is_string($this->table) || !$this->table) {
-            throw new \SimpleSAML\Error\Exception('AttributeFromSQL: invalid database table');
+            throw new Error\Exception('AttributeFromSQL: invalid database table');
         }
 
         if (array_key_exists('replace', $config)) {
@@ -90,7 +92,7 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
 
         if (array_key_exists('limit', $config)) {
             if (!is_array($config['limit'])) {
-                throw new \SimpleSAML\Error\Exception('AttributeFromSQL: limit must be an array of attribute names');
+                throw new Error\Exception('AttributeFromSQL: limit must be an array of attribute names');
             }
             $this->limit = $config['limit'];
         }
@@ -113,7 +115,7 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
         try {
             $db = new \PDO($this->dsn, $this->username, $this->password);
         } catch (\PDOException $e) {
-            throw new \SimpleSAML\Error\Exception(
+            throw new Error\Exception(
                 'AttributeFromSQL: Failed to connect to \'' .
                 $this->dsn . '\': ' . $e->getMessage()
             );
@@ -168,13 +170,13 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
                 ';'
             );
         } catch (\PDOException $e) {
-            throw new \SimpleSAML\Error\Exception('AttributeFromSQL: prepare() failed: ' . $e->getMessage());
+            throw new Error\Exception('AttributeFromSQL: prepare() failed: ' . $e->getMessage());
         }
 
         try {
             $res = $sth->execute([$attributes[$this->identifyingAttribute][0], $state["Destination"]["entityid"]]);
         } catch (\PDOException $e) {
-            throw new \SimpleSAML\Error\Exception(
+            throw new Error\Exception(
                 'AttributeFromSQL: execute(' . $attributes[$this->identifyingAttribute][0] .
                 ', ' . $state["Destination"]["entityid"] . ') failed: ' . $e->getMessage()
             );
@@ -183,7 +185,7 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
         try {
             $data = $sth->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
-            throw new \SimpleSAML\Error\Exception('AttributeFromSQL: fetchAll() failed: ' . $e->getMessage());
+            throw new Error\Exception('AttributeFromSQL: fetchAll() failed: ' . $e->getMessage());
         }
 
         if (count($data) === 0) {
