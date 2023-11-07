@@ -23,11 +23,11 @@
     },
     "require": {
         "php": "^8.0",
-        "simplesamlphp/assert": "^1.0",
+        "simplesamlphp/assert": "^0.8.0 || ^1.0.0",
         "ext-pdo": "^8.0"
     },
     "require-dev": {
-        "simplesamlphp/simplesamlphp": "^2.1.0-rc1",
+        "simplesamlphp/simplesamlphp": ">=2.0.0 <2.3.0",
         "simplesamlphp/simplesamlphp-test-framework": "^1.5.1"
     },
     "suggest": {
