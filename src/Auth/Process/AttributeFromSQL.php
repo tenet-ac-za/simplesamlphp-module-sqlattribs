@@ -30,6 +30,9 @@ class AttributeFromSQL extends Auth\ProcessingFilter
     /** @var string The password we should connect to the database with. */
     private ?string $password;
 
+    /** @var array Options passed to PDO. */
+    private $driver_options = [];
+
     /** @var string The name of the database table to use. */
     private string $table = 'AttributeFromSQL';
 
@@ -76,6 +79,9 @@ class AttributeFromSQL extends Auth\ProcessingFilter
             if (array_key_exists('password', $config['database'])) {
                 $this->password = $config['database']['password'];
             }
+            if (array_key_exists('driver_options', $config['database'])) {
+                $this->driver_options = $config['database']['driver_options'];
+            }
             if (array_key_exists('table', $config['database'])) {
                 $this->table = $config['database']['table'];
             }
@@ -116,7 +122,7 @@ class AttributeFromSQL extends Auth\ProcessingFilter
     private function connect(): \PDO
     {
         try {
-            $db = new \PDO($this->dsn, $this->username, $this->password);
+            $db = new \PDO($this->dsn, $this->username, $this->password, $this->driver_options);
         } catch (\PDOException $e) {
             throw new Error\Exception(
                 'AttributeFromSQL: Failed to connect to \'' .
