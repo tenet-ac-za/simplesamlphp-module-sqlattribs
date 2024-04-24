@@ -45,6 +45,8 @@ class AttributeFromSQL extends Auth\ProcessingFilter
     /** @var bool|false Should we ignore expiry */
     private bool $ignoreExpiry;
 
+    private $sqlEscapeChar = '`';
+    
     /**
      * Initialize this filter, parse configuration.
      *
@@ -129,9 +131,11 @@ class AttributeFromSQL extends Auth\ProcessingFilter
         switch ($driver) {
             case 'mysql':
                 $db->exec("SET NAMES 'utf8'");
+                $this->sqlEscapeChar = '`';
                 break;
             case 'pgsql':
                 $db->exec("SET NAMES 'UTF8'");
+                $this->sqlEscapeChar = '"';
                 break;
         }
 
@@ -160,13 +164,14 @@ class AttributeFromSQL extends Auth\ProcessingFilter
         }
 
         $db = $this->connect();
+        $esc = $this->sqlEscapeChar;
 
         try {
             $sth = $db->prepare(
-                'SELECT `attribute`,`value` FROM ' .
+                'SELECT ' . $esc . 'attribute' . $esc . ',' . $esc . 'value' . $esc . ' FROM ' .
                 $this->table .
-                ' WHERE `uid`=? AND (`sp`=\'%\' OR `sp`=?)' .
-                ($this->ignoreExpiry ? '' : ' AND `expires`>CURRENT_DATE') .
+                ' WHERE ' . $esc . 'uid' . $esc . '=? AND (' . $esc . 'sp' . $esc . '=\'%\' OR ' . $esc . 'sp' . $esc . '=?)' .
+                ($this->ignoreExpiry ? '' : ' AND ' . $esc . 'expires' . $esc . '>CURRENT_DATE') .
                 ';'
             );
         } catch (\PDOException $e) {
