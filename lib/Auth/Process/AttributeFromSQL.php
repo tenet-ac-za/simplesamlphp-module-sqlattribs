@@ -23,6 +23,9 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
     /** @var string The password we should connect to the database with. */
     private $password;
 
+    /** @var array Options passed to PDO. */
+    private $driver_options = [];
+
     /** @var string The name of the database table to use. */
     private $table = 'AttributeFromSQL';
 
@@ -70,6 +73,9 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
             if (array_key_exists('password', $config['database'])) {
                 $this->password = $config['database']['password'];
             }
+            if (array_key_exists('driver_options', $config['database'])) {
+                $this->driver_options = $config['database']['driver_options'];
+            }
             if (array_key_exists('table', $config['database'])) {
                 $this->table = $config['database']['table'];
             }
@@ -106,7 +112,7 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
     private function connect()
     {
         try {
-            $db = new \PDO($this->dsn, $this->username, $this->password);
+            $db = new \PDO($this->dsn, $this->username, $this->password, $this->driver_options);
         } catch (\PDOException $e) {
             throw new \SimpleSAML\Error\Exception('AttributeFromSQL: Failed to connect to \'' .
                 $this->dsn . '\': ' . $e->getMessage()
