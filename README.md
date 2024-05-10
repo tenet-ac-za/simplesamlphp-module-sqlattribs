@@ -89,6 +89,8 @@ Where the parameters are as follows:
 
   * `table` - the name of the table/view to search for attributes, defaults to _AttributeFromSQL_
 
+  * `driver_options` - additional driver-specific connection options to pass to the PDO constructor
+
 Adding attributes
 -----------------
 
