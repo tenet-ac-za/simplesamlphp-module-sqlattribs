@@ -38,6 +38,9 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
     /** @var bool|false Should we ignore expiry */
     private $ignoreExpiry = false;
 
+    /** @var string Character used to quote SQL identifiers. Default to " per SQL:1999 */
+    private $sqlIdentifierQuoteChar = '"';
+
     /**
      * Initialize this filter, parse configuration.
      *
@@ -118,9 +121,11 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
         switch ($driver) {
             case 'mysql':
                 $db->exec("SET NAMES 'utf8'");
+                $this->sqlIdentifierQuoteChar = '`';
                 break;
             case 'pgsql':
                 $db->exec("SET NAMES 'UTF8'");
+                $this->sqlIdentifierQuoteChar = '"';
                 break;
         }
 
@@ -149,13 +154,14 @@ class AttributeFromSQL extends \SimpleSAML\Auth\ProcessingFilter
         }
 
         $db = $this->connect();
+        $iq = $this->sqlIdentifierQuoteChar;
 
         try {
             $sth = $db->prepare(
-                'SELECT `attribute`,`value` FROM ' .
+                'SELECT ' . $iq . 'attribute' . $iq . ',' . $iq . 'value' . $iq . ' FROM ' .
                 $this->table .
-                ' WHERE `uid`=? AND (`sp`=\'%\' OR `sp`=?)' .
-                ($this->ignoreExpiry ? '' : ' AND `expires`>CURRENT_DATE') .
+                ' WHERE ' . $iq . 'uid' . $iq . '=? AND (' . $iq . 'sp' . $iq . '=\'%\' OR ' . $iq . 'sp' . $iq . '=?)' .
+                ($this->ignoreExpiry ? '' : ' AND ' . $iq . 'expires' . $iq . '>CURRENT_DATE') .
                 ';'
             );
         } catch (\PDOException $e) {
