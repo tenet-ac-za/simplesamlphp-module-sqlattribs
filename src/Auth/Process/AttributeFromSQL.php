@@ -170,8 +170,8 @@ class AttributeFromSQL extends Auth\ProcessingFilter
         try {
             $sth = $db->prepare(
                 'SELECT ' . $iq . 'attribute' . $iq . ',' . $iq . 'value' . $iq . ' FROM ' .
-                $this->table .
-                ' WHERE ' . $iq . 'uid' . $iq . '=? AND (' . $iq . 'sp' . $iq . '=\'%\' OR ' . $iq . 'sp' . $iq . '=?)' .
+                $this->table . ' WHERE ' .
+                $iq . 'uid' . $iq . '=? AND (' . $iq . 'sp' . $iq . '=\'%\' OR ' . $iq . 'sp' . $iq . '=?)' .
                 ($this->ignoreExpiry ? '' : ' AND ' . $iq . 'expires' . $iq . '>CURRENT_DATE') .
                 ';'
             );
