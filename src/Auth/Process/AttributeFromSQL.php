@@ -45,8 +45,9 @@ class AttributeFromSQL extends Auth\ProcessingFilter
     /** @var bool|false Should we ignore expiry */
     private bool $ignoreExpiry;
 
-    private $sqlEscapeChar = '`';
-    
+    /** @var string Character used to quote SQL identifiers. Default to " per SQL:1999 */
+    private $sqlIdentifierQuoteChar = '"';
+
     /**
      * Initialize this filter, parse configuration.
      *
@@ -131,11 +132,11 @@ class AttributeFromSQL extends Auth\ProcessingFilter
         switch ($driver) {
             case 'mysql':
                 $db->exec("SET NAMES 'utf8'");
-                $this->sqlEscapeChar = '`';
+                $this->sqlIdentifierQuoteChar = '`';
                 break;
             case 'pgsql':
                 $db->exec("SET NAMES 'UTF8'");
-                $this->sqlEscapeChar = '"';
+                $this->sqlIdentifierQuoteChar = '"';
                 break;
         }
 
@@ -164,14 +165,14 @@ class AttributeFromSQL extends Auth\ProcessingFilter
         }
 
         $db = $this->connect();
-        $esc = $this->sqlEscapeChar;
+        $iq = $this->sqlIdentifierQuoteChar;
 
         try {
             $sth = $db->prepare(
-                'SELECT ' . $esc . 'attribute' . $esc . ',' . $esc . 'value' . $esc . ' FROM ' .
+                'SELECT ' . $iq . 'attribute' . $iq . ',' . $iq . 'value' . $iq . ' FROM ' .
                 $this->table .
-                ' WHERE ' . $esc . 'uid' . $esc . '=? AND (' . $esc . 'sp' . $esc . '=\'%\' OR ' . $esc . 'sp' . $esc . '=?)' .
-                ($this->ignoreExpiry ? '' : ' AND ' . $esc . 'expires' . $esc . '>CURRENT_DATE') .
+                ' WHERE ' . $iq . 'uid' . $iq . '=? AND (' . $iq . 'sp' . $iq . '=\'%\' OR ' . $iq . 'sp' . $iq . '=?)' .
+                ($this->ignoreExpiry ? '' : ' AND ' . $iq . 'expires' . $iq . '>CURRENT_DATE') .
                 ';'
             );
         } catch (\PDOException $e) {
