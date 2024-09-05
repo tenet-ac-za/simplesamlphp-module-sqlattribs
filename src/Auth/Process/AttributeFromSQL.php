@@ -126,7 +126,7 @@ class AttributeFromSQL extends Auth\ProcessingFilter
         } catch (\PDOException $e) {
             throw new Error\Exception(
                 'AttributeFromSQL: Failed to connect to \'' .
-                $this->dsn . '\': ' . $e->getMessage()
+                $this->dsn . '\': ' . $e->getMessage(),
             );
         }
         $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
@@ -179,7 +179,7 @@ class AttributeFromSQL extends Auth\ProcessingFilter
                 $this->table . ' WHERE ' .
                 $iq . 'uid' . $iq . '=? AND (' . $iq . 'sp' . $iq . '=\'%\' OR ' . $iq . 'sp' . $iq . '=?)' .
                 ($this->ignoreExpiry ? '' : ' AND ' . $iq . 'expires' . $iq . '>CURRENT_DATE') .
-                ';'
+                ';',
             );
         } catch (\PDOException $e) {
             throw new Error\Exception('AttributeFromSQL: prepare() failed: ' . $e->getMessage());
@@ -190,7 +190,7 @@ class AttributeFromSQL extends Auth\ProcessingFilter
         } catch (\PDOException $e) {
             throw new Error\Exception(
                 'AttributeFromSQL: execute(' . $attributes[$this->identifyingAttribute][0] .
-                ', ' . $state["Destination"]["entityid"] . ') failed: ' . $e->getMessage()
+                ', ' . $state["Destination"]["entityid"] . ') failed: ' . $e->getMessage(),
             );
         }
 
@@ -203,7 +203,7 @@ class AttributeFromSQL extends Auth\ProcessingFilter
         if (count($data) === 0) {
             Logger::info(
                 'AttributeFromSQL: no additional attributes for ' .
-                $this->identifyingAttribute . '=\'' . $attributes[$this->identifyingAttribute][0] . '\''
+                $this->identifyingAttribute . '=\'' . $attributes[$this->identifyingAttribute][0] . '\'',
             );
             return;
         }
@@ -216,7 +216,7 @@ class AttributeFromSQL extends Auth\ProcessingFilter
             if (empty($row['attribute']) || $row['value'] === null) {
                 Logger::debug(
                     'AttributeFromSQL: skipping invalid attribute/value tuple: '
-                    . var_export($row, true)
+                    . var_export($row, true),
                 );
                 continue;
             }
@@ -228,7 +228,7 @@ class AttributeFromSQL extends Auth\ProcessingFilter
             if ($this->limit !== null && !in_array($name, $this->limit, true)) {
                 Logger::notice(
                     'AttributeFromSQL: skipping unwanted attribute ' .
-                    $name . ' [limited to: ' . join(', ', $this->limit) . ']'
+                    $name . ' [limited to: ' . join(', ', $this->limit) . ']',
                 );
                 continue;
             }
@@ -241,7 +241,7 @@ class AttributeFromSQL extends Auth\ProcessingFilter
                 /* Value already exists in attribute. */
                 Logger::debug(
                     'AttributeFromSQL: skipping duplicate attribute/value tuple ' .
-                    $name . '=\'' . $value . '\''
+                    $name . '=\'' . $value . '\'',
                 );
                 continue;
             }
