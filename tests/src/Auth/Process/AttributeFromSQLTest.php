@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace SimpleSAML\Test\Module\sqlattribs\Auth\Process;
 
-use PHPUnit\Framework\TestCase;
 use SimpleSAML\Configuration;
 use SimpleSAML\Module\sqlattribs\Auth\Process\AttributeFromSQL;
+use SimpleSAML\TestUtils\ClearStateTestCase;
 
-final class AttributeFromSQLTest extends TestCase
+final class AttributeFromSQLTest extends ClearStateTestCase
 {
     /**
      * Helper function to run the filter with a given configuration.
@@ -26,6 +26,7 @@ final class AttributeFromSQLTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
         Configuration::loadFromArray([], '[ARRAY]', 'simplesaml');
     }
 
