@@ -85,7 +85,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: ctype, date, dom, fileinfo, filter, hash, intl, mbstring, mysql, openssl, pcre, posix, spl, xdebug, xml
+          extensions: >
+            ctype, date, dom, fileinfo, filter, hash, intl, mbstring,
+            mysql, openssl, pcre, posix, spl, xdebug, xml
           tools: composer
           ini-values: error_reporting=E_ALL, pcov.directory=.
           coverage: pcov
