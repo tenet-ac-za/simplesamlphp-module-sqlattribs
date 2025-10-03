@@ -8,35 +8,96 @@ on:  # yamllint disable-line rule:truthy
     paths-ignore:
       - '**.md'
   pull_request:
-    branches: [master, release-*]
+    branches: [main, release-*]
     paths-ignore:
       - '**.md'
   workflow_dispatch:
 
 jobs:
+  phplinter:
+    name: 'PHP-Linter'
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.1', '8.2', '8.3', '8.4']
+
+    uses: simplesamlphp/simplesamlphp-test-framework/.github/workflows/reusable_phplinter.yml@v1.10.0
+    with:
+      php-version: ${{ matrix.php-version }}
+
   linter:
-    name: Linter
-    runs-on: ['ubuntu-latest']
+    name: 'Linter'
+    strategy:
+      fail-fast: false
+
+    uses: simplesamlphp/simplesamlphp-test-framework/.github/workflows/reusable_linter.yml@v1.10.0
+    with:
+      enable_eslinter: false
+      enable_jsonlinter: true
+      enable_stylelinter: false
+      enable_yamllinter: true
+
+  unit-tests-linux:
+    name: "Unit tests, PHP ${{ matrix.php-versions }}, ${{ matrix.operating-system }}"
+    runs-on: ${{ matrix.operating-system }}
+    needs: [phplinter, linter]
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: [ubuntu-latest]
+        php-versions: ['8.1', '8.2', '8.3', '8.4']
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Setup PHP, with composer and extensions
+        # https://github.com/shivammathur/setup-php
+        uses: shivammathur/setup-php@v2
         with:
-          fetch-depth: 0
+          php-version: ${{ matrix.php-versions }}
+          extensions: ctype, date, dom, fileinfo, filter, hash, intl, mbstring, openssl, pcre, posix, spl, xdebug, xml
+          tools: composer
+          ini-values: error_reporting=E_ALL, pcov.directory=.
+          coverage: pcov
 
-      - name: Lint Code Base
-        uses: github/super-linter/slim@v4
-        env:
-          LOG_LEVEL: NOTICE
-          VALIDATE_ALL_CODEBASE: true
-          LINTER_RULES_PATH: 'tools/linters'
-          VALIDATE_CSS: true
-          VALIDATE_JAVASCRIPT_ES: true
-          VALIDATE_JSON: true
-          VALIDATE_PHP_BUILTIN: true
-          VALIDATE_YAML: true
-          VALIDATE_XML: true
-          VALIDATE_GITHUB_ACTIONS: true
-          GITHUB_ACTIONS_COMMAND_ARGS: '-ignore SC2016:'
+      - name: Setup problem matchers for PHP
+        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+
+      - name: Setup problem matchers for PHPUnit
+        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - uses: actions/checkout@v5
+
+      - name: Get composer cache directory
+        run: echo COMPOSER_CACHE="$(composer config cache-files-dir)" >> "$GITHUB_ENV"
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: $COMPOSER_CACHE
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Run unit tests with coverage
+        if: ${{ matrix.php-versions == '8.4' }}
+        run: vendor/bin/phpunit --exclude-group skipOnGithub
+
+      - name: Run unit tests (no coverage)
+        if: ${{ matrix.php-versions != '8.4' }}
+        run: vendor/bin/phpunit --exclude-group skipOnGithub --no-coverage
+
+      - name: Save coverage data
+        if: ${{ matrix.php-versions == '8.4' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-data
+          path: ${{ github.workspace }}/build
 
   quality:
     name: Quality control
@@ -49,15 +110,14 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           # Should be the higest supported version, so we can use the newest tools
-          php-version: '8.2'
-          tools: composer, composer-require-checker, composer-unused, phpcs, psalm
-          # optional performance gain for psalm: opcache
-          extensions: ctype, date, dom, fileinfo, filter, hash, intl, mbstring, opcache, openssl, pcre, posix, spl, xml
+          php-version: '8.4'
+          tools: composer, composer-require-checker, composer-unused
+          extensions: ctype, date, dom, filter, hash, intl, mbstring, opcache, openssl, pcre, spl, xml
 
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Get composer cache directory
         run: echo COMPOSER_CACHE="$(composer config cache-files-dir)" >> "$GITHUB_ENV"
@@ -76,35 +136,23 @@ jobs:
         run: composer install --no-progress --prefer-dist --optimize-autoloader
 
       - name: Check code for hard dependencies missing in composer.json
-        run: composer-require-checker check --config-file=tools/composer-require-checker.json composer.json
+        run: composer-require-checker check --config-file tools/composer-require-checker.json composer.json
 
       - name: Check code for unused dependencies in composer.json
-        run: composer-unused
+        run: |
+          composer-unused \
+            --excludePackage=simplesamlphp/simplesamlphp-assets-jquery
 
       - name: PHP Code Sniffer
-        run: phpcs
+        run: vendor/bin/phpcs
 
-      - name: Psalm
-        continue-on-error: true
+      - name: PHPStan
         run: |
-          psalm -c psalm.xml \
-          --show-info=true \
-          --shepherd \
-          --php-version=${{ steps.setup-php.outputs.php-version }}
+          vendor/bin/phpstan analyze -c phpstan.neon --debug
 
-      - name: Psalm (testsuite)
+      - name: PHPStan (testsuite)
         run: |
-          psalm -c psalm-dev.xml \
-          --show-info=true \
-          --shepherd \
-          --php-version=${{ steps.setup-php.outputs.php-version }}
-
-      - name: Psalter
-        run: |
-          psalm --alter \
-          --issues=UnnecessaryVarAnnotation \
-          --dry-run \
-          --php-version=${{ steps.setup-php.outputs.php-version }}
+          vendor/bin/phpstan analyze -c phpstan-dev.neon --debug
 
   security:
     name: Security checks
@@ -115,15 +163,15 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           # Should be the lowest supported version
-          php-version: '8.0'
-          extensions: ctype, date, dom, fileinfo, filter, hash, intl, mbstring, openssl, pcre, posix, spl, xml
+          php-version: '8.1'
+          extensions: ctype, date, dom, filter, hash, intl, mbstring, openssl, pcre, spl, xml
           tools: composer
           coverage: none
 
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Get composer cache directory
         run: echo COMPOSER_CACHE="$(composer config cache-files-dir)" >> "$GITHUB_ENV"
@@ -147,122 +195,13 @@ jobs:
       - name: Security check for updated dependencies
         run: composer audit
 
-  unit-tests-linux:
-    name: "Unit tests, PHP ${{ matrix.php-versions }}, ${{ matrix.operating-system }}"
-    runs-on: ${{ matrix.operating-system }}
-    needs: [linter, quality, security]
-    strategy:
-      fail-fast: false
-      matrix:
-        operating-system: [ubuntu-latest]
-        php-versions: ['8.0', '8.1', '8.2']
-
-    steps:
-      - name: Setup test MySQL database
-        run: |
-          sudo systemctl start mysql.service
-          mysql -uroot -proot -e 'CREATE DATABASE IF NOT EXISTS simplesamlphp;'
-          mysql -uroot -proot -e '
-            CREATE TABLE IF NOT EXISTS `AttributeFromSQL` (
-              `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-              `uid` VARCHAR(100) NOT NULL,
-              `sp` VARCHAR(250) DEFAULT "%",
-              `attribute` VARCHAR(30) NOT NULL,
-              `value` TEXT,
-              `expires` DATE DEFAULT "9999-12-31",
-              PRIMARY KEY (`id`)
-            ) DEFAULT CHARSET=utf8;
-            CREATE USER IF NOT EXISTS `phpunit`@`localhost` IDENTIFIED BY "phpunit";
-            GRANT ALL ON `simplesamlphp`.* TO `phpunit`@`localhost`;
-          ' simplesamlphp
-          mysql -uroot -proot -e "
-            INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', '%', 'eduPersonEntitlement', 'urn:mace:exampleIdP.org:demoservice:demo-admin');
-            INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', 'https://idp.example.org/idp/shibboleth', 'eduPersonEntitlement', 'urn:mace:grnet.gr:eduroam:admin');
-            INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', '%', 'eduPersonAffiliation', 'faculty');
-            INSERT INTO AttributeFromSQL (uid, attribute, value) VALUES ('user@example.org', 'mail', 'user@example.org');
-            INSERT INTO AttributeFromSQL (uid, attribute, value, expires) VALUES ('user@example.org', 'mail', 'marty@example.org', '2015-10-21');
-          " simplesamlphp
-
-      - name: Setup PHP, with composer and extensions
-        # https://github.com/shivammathur/setup-php
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-versions }}
-          extensions: ctype, date, dom, fileinfo, filter, hash, intl, mbstring, openssl, pcre, posix, spl, xml
-          tools: composer
-          ini-values: error_reporting=E_ALL
-          coverage: pcov
-
-      - name: Setup problem matchers for PHP
-        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
-
-      - name: Setup problem matchers for PHPUnit
-        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
-
-      - name: Set git to use LF
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-
-      - uses: actions/checkout@v4
-
-      - name: Get composer cache directory
-        run: echo COMPOSER_CACHE="$(composer config cache-files-dir)" >> "$GITHUB_ENV"
-
-      - name: Cache composer dependencies
-        uses: actions/cache@v4
-        with:
-          path: $COMPOSER_CACHE
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
-
-      - name: Install Composer dependencies
-        run: composer install --no-progress --prefer-dist --optimize-autoloader
-
-      - name: Run unit tests with coverage
-        if: ${{ matrix.php-versions == '8.2' }}
-        run: vendor/bin/phpunit
-
-      - name: Run unit tests (no coverage)
-        if: ${{ matrix.php-versions != '8.2' }}
-        run: vendor/bin/phpunit --no-coverage
-
-      - name: Save coverage data
-        if: ${{ matrix.php-versions == '8.2' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-data
-          path: ${{ github.workspace }}/build
-
-  coverage:
-    name: Code coverage
-    runs-on: [ubuntu-latest]
-    needs: [unit-tests-linux]
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: coverage-data
-          path: ${{ github.workspace }}/build
-
-      - name: Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
-          verbose: true
-
   cleanup:
     name: Cleanup artifacts
-    needs: [unit-tests-linux, coverage]
+    needs: [unit-tests-linux]
     runs-on: [ubuntu-latest]
-    if: |
-      always() &&
-      needs.coverage.result == 'success' ||
-      (needs.unit-tests-linux == 'success' && needs.coverage == 'skipped')
+    if: ${{ always() && needs.unit-tests-linux.result == 'success' }}
 
     steps:
-      - uses: geekyeggo/delete-artifact@v2
+      - uses: geekyeggo/delete-artifact@v5
         with:
           name: coverage-data

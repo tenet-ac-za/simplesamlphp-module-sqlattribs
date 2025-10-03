@@ -13,9 +13,9 @@ final class AttributeFromSQLTest extends ClearStateTestCase
     /**
      * Helper function to run the filter with a given configuration.
      *
-     * @param  array $config The filter configuration.
-     * @param  array $request The request state.
-     * @return array  The state array after processing.
+     * @param  array<mixed> $config The filter configuration.
+     * @param  array<mixed> $request The request state.
+     * @return array<mixed> The state array after processing.
      */
     private static function processFilter(array $config, array $request): array
     {
@@ -24,11 +24,13 @@ final class AttributeFromSQLTest extends ClearStateTestCase
         return $request;
     }
 
+
     protected function setUp(): void
     {
         parent::setUp();
         Configuration::loadFromArray([], '[ARRAY]', 'simplesaml');
     }
+
 
     /**
      * Test the example from docs
@@ -71,6 +73,7 @@ final class AttributeFromSQLTest extends ClearStateTestCase
         $this->assertEquals($expectedData, $attributes, "Expected data was not correct");
     }
 
+
     /**
      * Test attribute replacement
      */
@@ -107,6 +110,7 @@ final class AttributeFromSQLTest extends ClearStateTestCase
         ];
         $this->assertEquals($expectedData, $attributes, "Expected data was not correct");
     }
+
 
     /**
      * Test attribute replacement

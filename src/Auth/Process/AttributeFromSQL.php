@@ -51,6 +51,7 @@ class AttributeFromSQL extends Auth\ProcessingFilter
     /** @var string Character used to quote SQL identifiers. Default to " per SQL:1999 */
     private $sqlIdentifierQuoteChar = '"';
 
+
     /**
      * Initialize this filter, parse configuration.
      *
@@ -113,6 +114,7 @@ class AttributeFromSQL extends Auth\ProcessingFilter
         }
     }
 
+
     /**
      * Create a database connection.
      *
@@ -149,11 +151,12 @@ class AttributeFromSQL extends Auth\ProcessingFilter
         return $db;
     }
 
+
     /**
      * Process this filter
      *
      * Logic is largely the same as (and lifted from) sqlauth:sql
-     * @param mixed &$state
+     * @param array &$state
      * @throws \SimpleSAML\Error\Exception
      * @return void
      */
