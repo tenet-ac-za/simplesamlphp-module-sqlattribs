@@ -48,12 +48,37 @@ jobs:
         php-versions: ['8.1', '8.2', '8.3', '8.4']
 
     steps:
+      - name: Setup test MySQL database
+        run: |
+          sudo systemctl start mysql.service
+          mysql -uroot -proot -e 'CREATE DATABASE IF NOT EXISTS simplesamlphp;'
+          mysql -uroot -proot -e '
+            CREATE TABLE IF NOT EXISTS `AttributeFromSQL` (
+              `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+              `uid` VARCHAR(100) NOT NULL,
+              `sp` VARCHAR(250) DEFAULT "%",
+              `attribute` VARCHAR(30) NOT NULL,
+              `value` TEXT,
+              `expires` DATE DEFAULT "9999-12-31",
+              PRIMARY KEY (`id`)
+            ) DEFAULT CHARSET=utf8;
+            CREATE USER IF NOT EXISTS `phpunit`@`localhost` IDENTIFIED BY "phpunit";
+            GRANT ALL ON `simplesamlphp`.* TO `phpunit`@`localhost`;
+          ' simplesamlphp
+          mysql -uroot -proot -e "
+            INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', '%', 'eduPersonEntitlement', 'urn:mace:exampleIdP.org:demoservice:demo-admin');
+            INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', 'https://idp.example.org/idp/shibboleth', 'eduPersonEntitlement', 'urn:mace:grnet.gr:eduroam:admin');
+            INSERT INTO AttributeFromSQL (uid, sp, attribute, value) VALUES ('user@example.org', '%', 'eduPersonAffiliation', 'faculty');
+            INSERT INTO AttributeFromSQL (uid, attribute, value) VALUES ('user@example.org', 'mail', 'user@example.org');
+            INSERT INTO AttributeFromSQL (uid, attribute, value, expires) VALUES ('user@example.org', 'mail', 'marty@example.org', '2015-10-21');
+          " simplesamlphp
+
       - name: Setup PHP, with composer and extensions
         # https://github.com/shivammathur/setup-php
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: ctype, date, dom, fileinfo, filter, hash, intl, mbstring, openssl, pcre, posix, spl, xdebug, xml
+          extensions: ctype, date, dom, fileinfo, filter, hash, intl, mbstring, mysql, openssl, pcre, posix, spl, xdebug, xml
           tools: composer
           ini-values: error_reporting=E_ALL, pcov.directory=.
           coverage: pcov
@@ -112,7 +137,7 @@ jobs:
           # Should be the higest supported version, so we can use the newest tools
           php-version: '8.4'
           tools: composer, composer-require-checker, composer-unused
-          extensions: ctype, date, dom, filter, hash, intl, mbstring, opcache, openssl, pcre, spl, xml
+          extensions: ctype, date, dom, filter, hash, intl, mbstring, mysql, opcache, openssl, pcre, spl, xml
 
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
@@ -140,8 +165,7 @@ jobs:
 
       - name: Check code for unused dependencies in composer.json
         run: |
-          composer-unused \
-            --excludePackage=simplesamlphp/simplesamlphp-assets-jquery
+          composer-unused
 
       - name: PHP Code Sniffer
         run: vendor/bin/phpcs
