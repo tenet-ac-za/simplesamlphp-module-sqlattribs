@@ -49,7 +49,7 @@ class AttributeFromSQL extends Auth\ProcessingFilter
     private bool $ignoreExpiry;
 
     /** @var string Character used to quote SQL identifiers. Default to " per SQL:1999 */
-    private $sqlIdentifierQuoteChar = '"';
+    private string $sqlIdentifierQuoteChar = '"';
 
 
     /**

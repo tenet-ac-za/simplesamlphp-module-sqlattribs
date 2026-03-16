@@ -25,13 +25,13 @@
         }
     },
     "require": {
-        "php": "^8.1",
-        "simplesamlphp/assert": "^0.8.0 || ^1.0.0",
-        "ext-pdo": "^8.1"
+        "php": "^8.3",
+        "simplesamlphp/assert": "^2.0.0",
+        "ext-pdo": "*"
     },
     "require-dev": {
-        "simplesamlphp/simplesamlphp": ">=2.0.0 <2.6.0",
-        "simplesamlphp/simplesamlphp-test-framework": "^1.9.2"
+        "simplesamlphp/simplesamlphp": ">=2.5.0 <2.6.0",
+        "simplesamlphp/simplesamlphp-test-framework": "^1.11.2"
     },
     "suggest": {
         "ext-mysql": "Needed if a MySQL backend is used",
