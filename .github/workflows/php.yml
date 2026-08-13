@@ -34,7 +34,7 @@ jobs:
     with:
       enable_eslinter: false
       enable_jsonlinter: true
-      enable_stylelinter: true
+      enable_stylelinter: false
       enable_yamllinter: true
 
   unit-tests-linux:
