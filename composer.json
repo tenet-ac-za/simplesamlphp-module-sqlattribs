@@ -26,12 +26,12 @@
     },
     "require": {
         "php": "^8.3",
-        "simplesamlphp/assert": "^2.0.0",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "simplesamlphp/assert": "^2.0"
     },
     "require-dev": {
-        "simplesamlphp/simplesamlphp": ">=2.5.0 <2.6.0",
-        "simplesamlphp/simplesamlphp-test-framework": "^1.11.2"
+        "simplesamlphp/simplesamlphp": "~2.5@dev",
+        "simplesamlphp/simplesamlphp-test-framework": "~1.11"
     },
     "suggest": {
         "ext-mysql": "Needed if a MySQL backend is used",
