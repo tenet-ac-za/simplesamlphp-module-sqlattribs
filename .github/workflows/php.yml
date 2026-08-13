@@ -34,7 +34,7 @@ jobs:
     with:
       enable_eslinter: false
       enable_jsonlinter: true
-      enable_stylelinter: false
+      enable_stylelinter: true
       enable_yamllinter: true
 
   unit-tests-linux:
@@ -88,7 +88,7 @@ jobs:
           php-version: ${{ matrix.php-versions }}
           extensions: >
             ctype, date, dom, fileinfo, filter, hash, intl, mbstring,
-            mysql, openssl, pcre, posix, spl, xdebug, xml
+            mysql, openssl, pcre, posix, sodium, spl, xdebug, xml
           tools: composer
           ini-values: error_reporting=E_ALL, pcov.directory=.
           coverage: pcov
@@ -121,11 +121,11 @@ jobs:
 
       - name: Run unit tests with coverage
         if: ${{ matrix.php-versions == '8.5' }}
-        run: vendor/bin/phpunit --exclude-group skipOnGithub
+        run: vendor/bin/phpunit --exclude-group=skipOnGithub
 
       - name: Run unit tests (no coverage)
         if: ${{ matrix.php-versions != '8.5' }}
-        run: vendor/bin/phpunit --exclude-group skipOnGithub --no-coverage
+        run: vendor/bin/phpunit --exclude-group=skipOnGithub --no-coverage
 
       - name: Save coverage data
         if: ${{ matrix.php-versions == '8.5' }}
@@ -137,6 +137,7 @@ jobs:
   quality:
     name: Quality control
     runs-on: [ubuntu-latest]
+    # needs: [unit-tests-linux]
 
     steps:
       - name: Setup PHP, with composer and extensions
@@ -146,11 +147,21 @@ jobs:
         with:
           # Should be the higest supported version, so we can use the newest tools
           php-version: '8.5'
-          tools: composer, composer-require-checker, composer-unused, phpcs, psalm
-          extensions: ctype, date, dom, filter, hash, intl, mbstring, mysql, opcache, openssl, pcre, spl, xml
+          tools: composer, composer-require-checker, composer-unused, phpcs, phpstan
+          extensions: >
+            ctype, date, dom, fileinfo, filter, hash, intl, mbstring,
+            mysql, opcache, openssl, pcre, posix, sodium, spl, xml
 
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+
+      - name: Setup problem matchers for PHPUnit
+        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
 
       - uses: actions/checkout@v6
 
@@ -191,6 +202,7 @@ jobs:
   security:
     name: Security checks
     runs-on: [ubuntu-latest]
+    # needs: [unit-tests-linux]
 
     steps:
       - name: Setup PHP, with composer and extensions
@@ -199,12 +211,22 @@ jobs:
         with:
           # Should be the lowest supported version
           php-version: '8.3'
-          extensions: ctype, date, dom, filter, hash, intl, mbstring, openssl, pcre, spl, xml
+          extensions: >
+            ctype, date, dom, fileinfo, filter, hash, intl, mbstring,
+            mysql, openssl, pcre, posix, sodium, spl, xml
           tools: composer
           coverage: none
 
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+
+      - name: Setup problem matchers for PHPUnit
+        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
 
       - uses: actions/checkout@v6
 
@@ -234,9 +256,11 @@ jobs:
     name: Cleanup artifacts
     needs: [unit-tests-linux]
     runs-on: [ubuntu-latest]
-    if: ${{ always() && needs.unit-tests-linux.result == 'success' }}
+    if: |
+      always() &&
+      needs.unit-tests-linux.result == 'success'
 
     steps:
-      - uses: geekyeggo/delete-artifact@v6
+      - uses: geekyeggo/delete-artifact@v5
         with:
           name: coverage-data
